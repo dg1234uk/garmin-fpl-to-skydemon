@@ -1,0 +1,447 @@
+{
+    "_declaration": {
+        "_attributes": {
+            "version": "1.0",
+            "encoding": "utf-8"
+        }
+    },
+    "flight-plan": {
+        "_attributes": {
+            "xmlns": "http://www8.garmin.com/xmlschemas/FlightPlan/v1"
+        },
+        "created": {
+            "_text": "2023-06-22T12:50:18Z"
+        },
+        "waypoint-table": {
+            "waypoint": [
+                {
+                    "identifier": {
+                        "_text": "A01"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.8396"
+                    },
+                    "lon": {
+                        "_text": "-2.7952"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A02"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.7969"
+                    },
+                    "lon": {
+                        "_text": "-2.7233"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A03"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.7388"
+                    },
+                    "lon": {
+                        "_text": "-2.6972"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A04"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.6807"
+                    },
+                    "lon": {
+                        "_text": "-2.7237"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A05"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.6382"
+                    },
+                    "lon": {
+                        "_text": "-2.7957"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A06"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.6227"
+                    },
+                    "lon": {
+                        "_text": "-2.8937"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A07"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.6382"
+                    },
+                    "lon": {
+                        "_text": "-2.9917"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A19"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.6238"
+                    },
+                    "lon": {
+                        "_text": "-3.0057"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A18"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.6061"
+                    },
+                    "lon": {
+                        "_text": "-2.8937"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A17"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.6238"
+                    },
+                    "lon": {
+                        "_text": "-2.7817"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A16"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.6723"
+                    },
+                    "lon": {
+                        "_text": "-2.6995"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A15"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.7387"
+                    },
+                    "lon": {
+                        "_text": "-2.6691"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A14"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.8052"
+                    },
+                    "lon": {
+                        "_text": "-2.6989"
+                    },
+                    "comment": {}
+                },
+                {
+                    "identifier": {
+                        "_text": "A13"
+                    },
+                    "type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "country-code": {
+                        "_text": "__"
+                    },
+                    "lat": {
+                        "_text": "53.8539"
+                    },
+                    "lon": {
+                        "_text": "-2.7811"
+                    },
+                    "comment": {}
+                }
+            ]
+        },
+        "route": {
+            "route-name": {
+                "_text": "ARC"
+            },
+            "flight-plan-index": {
+                "_text": "50"
+            },
+            "route-point": [
+                {
+                    "waypoint-identifier": {
+                        "_text": "A01"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A02"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A03"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A04"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A05"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A06"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A07"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A19"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A18"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A17"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A16"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A15"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A14"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A13"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                },
+                {
+                    "waypoint-identifier": {
+                        "_text": "A01"
+                    },
+                    "waypoint-type": {
+                        "_text": "USER WAYPOINT"
+                    },
+                    "waypoint-country-code": {
+                        "_text": "__"
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,49 +1,23 @@
-const fs = require('fs');
-const xml2js = require('xml-js');
-const path = require('path');
+import fs from 'fs';
+import xml2js from 'xml-js';
+import path from 'path';
 
-const inputDirectory = './input'; // specify the input directory containing the XML files
+// Access command line arguments
+const args = process.argv.slice(2);
 
-function convertDd2DMS(Dd) {
-  const degree = Math.floor(Dd);
-  const minute = Math.floor((Dd - degree) * 60);
-  const second = ((Dd - degree) * 60 - minute) * 60;
+// Set input and output directories from command-line arguments or use defaults
+const inputDirectory = args[0] || './input';
+const outputDirectory = args[1] || './output';
 
-  return { degree, minute, second };
+// Check if the input directory exists
+if (!fs.existsSync(inputDirectory)) {
+  console.error(`Input directory does not exist: ${inputDirectory}`);
+  process.exit(1);
 }
 
-// Helper functions for conversion
-function convertLatitude(lat) {
-  const {
-    degree: latDegree,
-    minute: latMinute,
-    second: latSecond,
-  } = convertDd2DMS(lat);
-  const latDirection = lat >= 0 ? 'N' : 'S';
-
-  const latString = `${latDirection}${latDegree
-    .toString()
-    .padStart(2, '0')}${latMinute.toString().padStart(2, '0')}${latSecond
-    .toFixed(2)
-    .toString()
-    .padStart(5, '0')}`;
-  return latString;
-}
-
-function convertLongitude(lon) {
-  const {
-    degree: lonDegree,
-    minute: lonMinute,
-    second: lonSecond,
-  } = convertDd2DMS(lon);
-  const lonDirection = lon >= 0 ? 'E' : 'W';
-  const lonString = `${lonDirection}${lonDegree
-    .toString()
-    .padStart(3, '0')}${lonMinute.toString().padStart(2, '0')}${lonSecond
-    .toFixed(2)
-    .toString()
-    .padStart(5, '0')}`;
-  return lonString;
+// Check if the output directory exists, if not create it
+if (!fs.existsSync(outputDirectory)) {
+  fs.mkdirSync(outputDirectory);
 }
 
 fs.readdir(inputDirectory, (err, files) => {
@@ -63,9 +37,24 @@ fs.readdir(inputDirectory, (err, files) => {
       }
 
       // Convert the input XML to JSON
-      const inputJson = JSON.parse(
-        xml2js.xml2json(inputXml, { compact: true })
-      );
+      let inputJson;
+      try {
+        inputJson = JSON.parse(xml2js.xml2json(inputXml, { compact: true }));
+      } catch (err) {
+        console.error(`Error parsing the XML: ${err}`);
+        return;
+      }
+
+      // Check if the JSON object has the expected structure
+      if (
+        !inputJson ||
+        !inputJson['flight-plan'] ||
+        !inputJson['flight-plan']['waypoint-table'] ||
+        !Array.isArray(inputJson['flight-plan']['waypoint-table']['waypoint'])
+      ) {
+        console.error('Unexpected JSON structure');
+        return;
+      }
 
       // Extract necessary data
       const waypoints = inputJson['flight-plan']['waypoint-table'][
@@ -106,8 +95,9 @@ fs.readdir(inputDirectory, (err, files) => {
         '<?xml version="1.0" encoding="utf-8"?>\n' +
         xml2js.json2xml(outputJson, { compact: true, spaces: 2 });
 
+      // Construct the output file path
       const outputFilePath = path.join(
-        './output',
+        outputDirectory,
         path.basename(file, path.extname(file)) + '.flightplan'
       );
 
@@ -124,3 +114,45 @@ fs.readdir(inputDirectory, (err, files) => {
     });
   });
 });
+
+// Helper functions for conversion
+function convertDd2DMS(Dd) {
+  const degree = Math.floor(Dd);
+  const minute = Math.floor((Dd - degree) * 60);
+  const second = ((Dd - degree) * 60 - minute) * 60;
+
+  return { degree, minute, second };
+}
+
+function convertLatitude(lat) {
+  const {
+    degree: latDegree,
+    minute: latMinute,
+    second: latSecond,
+  } = convertDd2DMS(lat);
+  const latDirection = lat >= 0 ? 'N' : 'S';
+
+  const latString = `${latDirection}${latDegree
+    .toString()
+    .padStart(2, '0')}${latMinute.toString().padStart(2, '0')}${latSecond
+    .toFixed(2)
+    .toString()
+    .padStart(5, '0')}`;
+  return latString;
+}
+
+function convertLongitude(lon) {
+  const {
+    degree: lonDegree,
+    minute: lonMinute,
+    second: lonSecond,
+  } = convertDd2DMS(lon);
+  const lonDirection = lon >= 0 ? 'E' : 'W';
+  const lonString = `${lonDirection}${lonDegree
+    .toString()
+    .padStart(3, '0')}${lonMinute.toString().padStart(2, '0')}${lonSecond
+    .toFixed(2)
+    .toString()
+    .padStart(5, '0')}`;
+  return lonString;
+}

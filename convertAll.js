@@ -9,6 +9,17 @@ const args = process.argv.slice(2);
 const inputDirectory = args[0] || './input';
 const outputDirectory = args[1] || './output';
 
+// Check if the input directory exists
+if (!fs.existsSync(inputDirectory)) {
+  console.error(`Input directory does not exist: ${inputDirectory}`);
+  process.exit(1);
+}
+
+// Check if the output directory exists, if not create it
+if (!fs.existsSync(outputDirectory)) {
+  fs.mkdirSync(outputDirectory);
+}
+
 function convertDd2DMS(Dd) {
   const degree = Math.floor(Dd);
   const minute = Math.floor((Dd - degree) * 60);
@@ -68,9 +79,24 @@ fs.readdir(inputDirectory, (err, files) => {
       }
 
       // Convert the input XML to JSON
-      const inputJson = JSON.parse(
-        xml2js.xml2json(inputXml, { compact: true })
-      );
+      let inputJson;
+      try {
+        inputJson = JSON.parse(xml2js.xml2json(inputXml, { compact: true }));
+      } catch (err) {
+        console.error(`Error parsing the XML: ${err}`);
+        return;
+      }
+
+      // Check if the JSON object has the expected structure
+      if (
+        !inputJson ||
+        !inputJson['flight-plan'] ||
+        !inputJson['flight-plan']['waypoint-table'] ||
+        !Array.isArray(inputJson['flight-plan']['waypoint-table']['waypoint'])
+      ) {
+        console.error('Unexpected JSON structure');
+        return;
+      }
 
       // Extract necessary data
       const waypoints = inputJson['flight-plan']['waypoint-table'][

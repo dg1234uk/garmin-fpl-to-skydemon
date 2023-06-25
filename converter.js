@@ -1,6 +1,6 @@
-const fs = require('fs');
-const xml2js = require('xml-js');
-const readline = require('readline');
+import fs from 'fs';
+import xml2js from 'xml-js';
+import readline from 'readline';
 
 const rl = readline.createInterface({
   input: process.stdin,

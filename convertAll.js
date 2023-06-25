@@ -2,7 +2,12 @@ import fs from 'fs';
 import xml2js from 'xml-js';
 import path from 'path';
 
-const inputDirectory = './input'; // specify the input directory containing the XML files
+// Access command line arguments
+const args = process.argv.slice(2);
+
+// Set input and output directories from command-line arguments or use defaults
+const inputDirectory = args[0] || './input';
+const outputDirectory = args[1] || './output';
 
 function convertDd2DMS(Dd) {
   const degree = Math.floor(Dd);
@@ -106,8 +111,9 @@ fs.readdir(inputDirectory, (err, files) => {
         '<?xml version="1.0" encoding="utf-8"?>\n' +
         xml2js.json2xml(outputJson, { compact: true, spaces: 2 });
 
+      // Construct the output file path
       const outputFilePath = path.join(
-        './output',
+        outputDirectory,
         path.basename(file, path.extname(file)) + '.flightplan'
       );
 

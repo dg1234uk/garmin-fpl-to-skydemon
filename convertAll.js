@@ -20,48 +20,6 @@ if (!fs.existsSync(outputDirectory)) {
   fs.mkdirSync(outputDirectory);
 }
 
-function convertDd2DMS(Dd) {
-  const degree = Math.floor(Dd);
-  const minute = Math.floor((Dd - degree) * 60);
-  const second = ((Dd - degree) * 60 - minute) * 60;
-
-  return { degree, minute, second };
-}
-
-// Helper functions for conversion
-function convertLatitude(lat) {
-  const {
-    degree: latDegree,
-    minute: latMinute,
-    second: latSecond,
-  } = convertDd2DMS(lat);
-  const latDirection = lat >= 0 ? 'N' : 'S';
-
-  const latString = `${latDirection}${latDegree
-    .toString()
-    .padStart(2, '0')}${latMinute.toString().padStart(2, '0')}${latSecond
-    .toFixed(2)
-    .toString()
-    .padStart(5, '0')}`;
-  return latString;
-}
-
-function convertLongitude(lon) {
-  const {
-    degree: lonDegree,
-    minute: lonMinute,
-    second: lonSecond,
-  } = convertDd2DMS(lon);
-  const lonDirection = lon >= 0 ? 'E' : 'W';
-  const lonString = `${lonDirection}${lonDegree
-    .toString()
-    .padStart(3, '0')}${lonMinute.toString().padStart(2, '0')}${lonSecond
-    .toFixed(2)
-    .toString()
-    .padStart(5, '0')}`;
-  return lonString;
-}
-
 fs.readdir(inputDirectory, (err, files) => {
   if (err) {
     console.error(`Error reading directory: ${err}`);
@@ -156,3 +114,45 @@ fs.readdir(inputDirectory, (err, files) => {
     });
   });
 });
+
+// Helper functions for conversion
+function convertDd2DMS(Dd) {
+  const degree = Math.floor(Dd);
+  const minute = Math.floor((Dd - degree) * 60);
+  const second = ((Dd - degree) * 60 - minute) * 60;
+
+  return { degree, minute, second };
+}
+
+function convertLatitude(lat) {
+  const {
+    degree: latDegree,
+    minute: latMinute,
+    second: latSecond,
+  } = convertDd2DMS(lat);
+  const latDirection = lat >= 0 ? 'N' : 'S';
+
+  const latString = `${latDirection}${latDegree
+    .toString()
+    .padStart(2, '0')}${latMinute.toString().padStart(2, '0')}${latSecond
+    .toFixed(2)
+    .toString()
+    .padStart(5, '0')}`;
+  return latString;
+}
+
+function convertLongitude(lon) {
+  const {
+    degree: lonDegree,
+    minute: lonMinute,
+    second: lonSecond,
+  } = convertDd2DMS(lon);
+  const lonDirection = lon >= 0 ? 'E' : 'W';
+  const lonString = `${lonDirection}${lonDegree
+    .toString()
+    .padStart(3, '0')}${lonMinute.toString().padStart(2, '0')}${lonSecond
+    .toFixed(2)
+    .toString()
+    .padStart(5, '0')}`;
+  return lonString;
+}

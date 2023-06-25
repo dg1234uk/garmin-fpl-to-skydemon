@@ -1,6 +1,10 @@
-const fs = require('fs');
-const xml2js = require('xml-js');
-const path = require('path');
+// const fs = require('fs');
+// const xml2js = require('xml-js');
+// const path = require('path');
+
+import fs from 'fs';
+import xml2js from 'xml-js';
+import path from 'path';
 
 const inputDirectory = './input'; // specify the input directory containing the XML files
 

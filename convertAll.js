@@ -2,118 +2,129 @@ import fs from 'fs';
 import xml2js from 'xml-js';
 import path from 'path';
 
-// Access command line arguments
-const args = process.argv.slice(2);
+const DEFAULT_INPUT_DIRECTORY = './input';
+const DEFAULT_OUTPUT_DIRECTORY = './output';
 
-// Set input and output directories from command-line arguments or use defaults
-const inputDirectory = args[0] || './input';
-const outputDirectory = args[1] || './output';
+async function main() {
+  // Access command line arguments
+  const args = process.argv.slice(2);
 
-// Check if the input directory exists
-if (!fs.existsSync(inputDirectory)) {
-  console.error(`Input directory does not exist: ${inputDirectory}`);
-  process.exit(1);
-}
+  // Set input and output directories from command-line arguments or use defaults
+  const inputDirectory = args[0] || DEFAULT_INPUT_DIRECTORY;
+  const outputDirectory = args[1] || DEFAULT_OUTPUT_DIRECTORY;
 
-// Check if the output directory exists, if not create it
-if (!fs.existsSync(outputDirectory)) {
-  fs.mkdirSync(outputDirectory);
-}
+  // Check if the input directory exists
+  try {
+    await fs.promises.access(inputDirectory);
+  } catch (err) {
+    console.error(`Input directory does not exist: ${inputDirectory}`);
+    return;
+  }
 
-fs.readdir(inputDirectory, (err, files) => {
-  if (err) {
+  // Check if the output directory exists, if not create it
+  try {
+    await fs.promises.access(outputDirectory);
+  } catch (err) {
+    await fs.promises.mkdir(outputDirectory);
+  }
+
+  let files;
+  try {
+    files = await fs.promises.readdir(inputDirectory);
+  } catch (err) {
     console.error(`Error reading directory: ${err}`);
     return;
   }
 
-  files.forEach((file) => {
+  for (const file of files) {
     const inputFile = path.join(inputDirectory, file);
+    let inputXml;
+    try {
+      inputXml = await fs.promises.readFile(inputFile, 'utf8');
+    } catch (err) {
+      console.error(`Error reading the file: ${err}`);
+      continue;
+    }
 
-    // Read the input XML from a file
-    fs.readFile(inputFile, 'utf8', (err, inputXml) => {
-      if (err) {
-        console.error(`Error reading the file: ${err}`);
-        return;
-      }
+    if (path.extname(file).toLowerCase() !== '.fpl') {
+      console.error(`Skipping non-fpl file: ${file}`);
+      continue;
+    }
 
-      // Convert the input XML to JSON
-      let inputJson;
-      try {
-        inputJson = JSON.parse(xml2js.xml2json(inputXml, { compact: true }));
-      } catch (err) {
-        console.error(`Error parsing the XML: ${err}`);
-        return;
-      }
+    // Convert the input XML to JSON
+    let inputJson;
+    try {
+      inputJson = JSON.parse(xml2js.xml2json(inputXml, { compact: true }));
+    } catch (err) {
+      console.error(`Error parsing the XML: ${err}`);
+      continue;
+    }
 
-      // Check if the JSON object has the expected structure
-      if (
-        !inputJson ||
-        !inputJson['flight-plan'] ||
-        !inputJson['flight-plan']['waypoint-table'] ||
-        !Array.isArray(inputJson['flight-plan']['waypoint-table']['waypoint'])
-      ) {
-        console.error('Unexpected JSON structure');
-        return;
-      }
+    // Check if the JSON object has the expected structure
+    if (
+      !inputJson ||
+      !inputJson['flight-plan'] ||
+      !inputJson['flight-plan']['waypoint-table'] ||
+      !Array.isArray(inputJson['flight-plan']['waypoint-table']['waypoint'])
+    ) {
+      console.error('Unexpected JSON structure');
+      continue;
+    }
 
-      // Extract necessary data
-      const waypoints = inputJson['flight-plan']['waypoint-table'][
-        'waypoint'
-      ].map((waypoint) => {
-        const lat = parseFloat(waypoint['lat']['_text']);
-        const lon = parseFloat(waypoint['lon']['_text']);
+    // Extract necessary data
+    const waypoints = inputJson['flight-plan']['waypoint-table'][
+      'waypoint'
+    ].map((waypoint) => {
+      const lat = parseFloat(waypoint['lat']['_text']);
+      const lon = parseFloat(waypoint['lon']['_text']);
 
-        const latString = convertLatitude(lat);
-        const lonString = convertLongitude(lon);
+      const latString = convertLatitude(lat);
+      const lonString = convertLongitude(lon);
 
-        return `${latString} ${lonString}`;
-      });
-
-      // Construct the output JSON object
-      const outputJson = {
-        DivelementsFlightPlanner: {
-          PrimaryRoute: {
-            _attributes: {
-              CourseType: 'GreatCircle',
-              Start: waypoints[0],
-              Level: '3000',
-              // CruiseProfile: '60 %',
-              // Time: '133316352000000000',
-              Rules: 'Vfr',
-              PlannedFuel: '1.000000',
-            },
-            RhumbLineRoute: waypoints.slice(1).map((to) => ({
-              _attributes: { To: to, Level: 'MSL', LevelChange: 'B' },
-            })),
-            ReferencedAirfields: {},
-          },
-        },
-      };
-
-      // Convert the output JSON back to XML
-      const outputXml =
-        '<?xml version="1.0" encoding="utf-8"?>\n' +
-        xml2js.json2xml(outputJson, { compact: true, spaces: 2 });
-
-      // Construct the output file path
-      const outputFilePath = path.join(
-        outputDirectory,
-        path.basename(file, path.extname(file)) + '.flightplan'
-      );
-
-      // Optionally, write the XML to an output file
-      fs.writeFile(outputFilePath, outputXml, 'utf8', (err) => {
-        if (err) {
-          console.error(`Error writing the file: ${err}`);
-        } else {
-          console.log(
-            `Converted XML output has been saved to ${outputFilePath}`
-          );
-        }
-      });
+      return `${latString} ${lonString}`;
     });
-  });
-});
+
+    // Construct the output JSON object
+    const outputJson = {
+      DivelementsFlightPlanner: {
+        PrimaryRoute: {
+          _attributes: {
+            CourseType: 'GreatCircle',
+            Start: waypoints[0],
+            Level: '3000',
+            // CruiseProfile: '60 %',
+            // Time: '133316352000000000',
+            Rules: 'Vfr',
+            PlannedFuel: '1.000000',
+          },
+          RhumbLineRoute: waypoints.slice(1).map((to) => ({
+            _attributes: { To: to, Level: 'MSL', LevelChange: 'B' },
+          })),
+          ReferencedAirfields: {},
+        },
+      },
+    };
+
+    // Convert the output JSON back to XML
+    const outputXml =
+      '<?xml version="1.0" encoding="utf-8"?>\n' +
+      xml2js.json2xml(outputJson, { compact: true, spaces: 2 });
+
+    // Construct the output file path
+    const outputFilePath = path.join(
+      outputDirectory,
+      path.basename(file, path.extname(file)) + '.flightplan'
+    );
+
+    // write the XML to an output file
+    try {
+      await fs.promises.writeFile(outputFilePath, outputXml, 'utf8');
+      console.log(`Converted XML output has been saved to ${outputFilePath}`);
+    } catch (err) {
+      console.error(`Error writing the file: ${err}`);
+    }
+  }
+}
 
 // Helper functions for conversion
 function convertDd2DMS(Dd) {
@@ -156,3 +167,5 @@ function convertLongitude(lon) {
     .padStart(5, '0')}`;
   return lonString;
 }
+
+main().catch((err) => console.error(err));

@@ -21,9 +21,9 @@ This script is specifically designed to process Garmin flight plan files with th
 ## Usage
 
 1. First, ensure that Node.js is installed on your system.
-2. Install the `xml2js` package using npm:
+2. Install the npm packages:
    ```
-   npm install xml2js
+   npm install
    ```
 3. Place the input files (with `.fpl` extension) in the input directory (default is `./input`).
 4. Run the script:

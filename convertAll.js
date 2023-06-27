@@ -5,22 +5,154 @@ import path from 'path';
 const DEFAULT_INPUT_DIRECTORY = './input';
 const DEFAULT_OUTPUT_DIRECTORY = './output';
 
-async function main() {
-  // Set input and output directories from command-line arguments or use defaults
-  const [
-    inputDirectory = DEFAULT_INPUT_DIRECTORY,
-    outputDirectory = DEFAULT_OUTPUT_DIRECTORY,
-  ] = process.argv.slice(2);
+// Helper functions
+function logError(message) {
+  console.error(message);
+}
 
-  await ensureDirectoryExists(inputDirectory);
-  await ensureDirectoryExists(outputDirectory, true);
-
-  const files = await getInputFiles(inputDirectory);
-
-  for (const file of files) {
-    await processFile(inputDirectory, outputDirectory, file);
+async function readFile(filePath) {
+  try {
+    return await fs.promises.readFile(filePath, 'utf8');
+  } catch (err) {
+    logError(`Error reading the file: ${err}`);
+    return null;
   }
 }
+
+async function writeFile(filePath, content) {
+  try {
+    await fs.promises.writeFile(filePath, content, 'utf8');
+    console.log(`File has been saved to ${filePath}`);
+  } catch (err) {
+    logError(`Error writing the file: ${err}`);
+  }
+}
+
+function convertDd2DMS(Dd) {
+  const sign = Math.sign(Dd);
+  const absDd = Math.abs(Dd);
+
+  const degree = Math.floor(absDd);
+  const minute = Math.floor((absDd - degree) * 60);
+  const second = ((absDd - degree) * 60 - minute) * 60;
+
+  return { degree: sign * degree, minute, second };
+}
+
+function convertLatitude(lat) {
+  if (typeof lat !== 'number' || lat < -90 || lat > 90) {
+    logError('Invalid latitude value');
+    return null;
+  }
+  const {
+    degree: latDegree,
+    minute: latMinute,
+    second: latSecond,
+  } = convertDd2DMS(lat);
+  const latDirection = lat >= 0 ? 'N' : 'S';
+
+  const latString = `${latDirection}${Math.abs(latDegree)
+    .toString()
+    .padStart(2, '0')}${latMinute.toString().padStart(2, '0')}${latSecond
+    .toFixed(2)
+    .toString()
+    .padStart(5, '0')}`;
+  return latString;
+}
+
+function convertLongitude(lon) {
+  if (typeof lon !== 'number' || lon < -180 || lon > 180) {
+    logError('Invalid longitude value');
+    return null;
+  }
+  const {
+    degree: lonDegree,
+    minute: lonMinute,
+    second: lonSecond,
+  } = convertDd2DMS(lon);
+  const lonDirection = lon >= 0 ? 'E' : 'W';
+  const lonString = `${lonDirection}${Math.abs(lonDegree)
+    .toString()
+    .padStart(3, '0')}${lonMinute.toString().padStart(2, '0')}${lonSecond
+    .toFixed(2)
+    .toString()
+    .padStart(5, '0')}`;
+  return lonString;
+}
+
+function isValidJsonStructure(inputJson) {
+  return (
+    inputJson &&
+    inputJson['flight-plan'] &&
+    inputJson['flight-plan']['waypoint-table'] &&
+    Array.isArray(inputJson['flight-plan']['waypoint-table']['waypoint'])
+  );
+}
+
+function extractWaypoints(inputJson) {
+  const routePoints = inputJson['flight-plan']['route']['route-point'];
+  if (!Array.isArray(routePoints)) {
+    return null;
+  }
+
+  const waypointTable = inputJson['flight-plan']['waypoint-table']['waypoint'];
+  const waypoints = [];
+
+  for (const point of routePoints) {
+    const waypointIdentifier =
+      point['waypoint-identifier'] && point['waypoint-identifier']['_text'];
+
+    const waypoint = waypointTable.find(
+      (wp) =>
+        wp['identifier'] && wp['identifier']['_text'] === waypointIdentifier
+    );
+
+    if (waypoint && waypoint['lat'] && waypoint['lon']) {
+      const lat = parseFloat(waypoint['lat']['_text']);
+      const lon = parseFloat(waypoint['lon']['_text']);
+
+      if (!isNaN(lat) && !isNaN(lon)) {
+        const latString = convertLatitude(lat);
+        const lonString = convertLongitude(lon);
+
+        if (latString && lonString) {
+          waypoints.push(`${latString} ${lonString}`);
+        }
+      }
+    }
+  }
+
+  return waypoints;
+}
+
+function constructOutputJson(waypoints) {
+  return {
+    DivelementsFlightPlanner: {
+      PrimaryRoute: {
+        _attributes: {
+          CourseType: 'GreatCircle',
+          Start: waypoints[0],
+          Level: '3000',
+          Rules: 'Vfr',
+          PlannedFuel: '1.000000',
+        },
+        RhumbLineRoute: waypoints.slice(1).map((to) => ({
+          _attributes: { To: to, Level: 'MSL', LevelChange: 'B' },
+        })),
+        ReferencedAirfields: {},
+      },
+    },
+  };
+}
+
+function convertJsonToXml(json) {
+  return (
+    '<?xml version="1.0" encoding="utf-8"?>\n' +
+    xml2js.json2xml(json, { compact: true, spaces: 2 })
+  );
+}
+
+// Core functions
 
 async function ensureDirectoryExists(directoryPath, createIfNotExist = false) {
   try {
@@ -91,151 +223,21 @@ async function processFile(inputDirectory, outputDirectory, file) {
   await writeFile(outputFilePath, outputXml);
 }
 
-function isValidJsonStructure(inputJson) {
-  return (
-    inputJson &&
-    inputJson['flight-plan'] &&
-    inputJson['flight-plan']['waypoint-table'] &&
-    Array.isArray(inputJson['flight-plan']['waypoint-table']['waypoint'])
-  );
-}
+async function main() {
+  // Set input and output directories from command-line arguments or use defaults
+  const [
+    inputDirectory = DEFAULT_INPUT_DIRECTORY,
+    outputDirectory = DEFAULT_OUTPUT_DIRECTORY,
+  ] = process.argv.slice(2);
 
-async function readFile(filePath) {
-  try {
-    return await fs.promises.readFile(filePath, 'utf8');
-  } catch (err) {
-    logError(`Error reading the file: ${err}`);
-    return null;
+  await ensureDirectoryExists(inputDirectory);
+  await ensureDirectoryExists(outputDirectory, true);
+
+  const files = await getInputFiles(inputDirectory);
+
+  for (const file of files) {
+    await processFile(inputDirectory, outputDirectory, file);
   }
-}
-
-async function writeFile(filePath, content) {
-  try {
-    await fs.promises.writeFile(filePath, content, 'utf8');
-    console.log(`File has been saved to ${filePath}`);
-  } catch (err) {
-    logError(`Error writing the file: ${err}`);
-  }
-}
-
-function logError(message) {
-  console.error(message);
-}
-
-function extractWaypoints(inputJson) {
-  const routePoints = inputJson['flight-plan']['route']['route-point'];
-  if (!Array.isArray(routePoints)) {
-    return null;
-  }
-
-  const waypointTable = inputJson['flight-plan']['waypoint-table']['waypoint'];
-  const waypoints = [];
-
-  for (const point of routePoints) {
-    const waypointIdentifier =
-      point['waypoint-identifier'] && point['waypoint-identifier']['_text'];
-
-    const waypoint = waypointTable.find(
-      (wp) =>
-        wp['identifier'] && wp['identifier']['_text'] === waypointIdentifier
-    );
-
-    if (waypoint && waypoint['lat'] && waypoint['lon']) {
-      const lat = parseFloat(waypoint['lat']['_text']);
-      const lon = parseFloat(waypoint['lon']['_text']);
-
-      if (!isNaN(lat) && !isNaN(lon)) {
-        const latString = convertLatitude(lat);
-        const lonString = convertLongitude(lon);
-
-        if (latString && lonString) {
-          waypoints.push(`${latString} ${lonString}`);
-        }
-      }
-    }
-  }
-
-  return waypoints;
-}
-
-function constructOutputJson(waypoints) {
-  return {
-    DivelementsFlightPlanner: {
-      PrimaryRoute: {
-        _attributes: {
-          CourseType: 'GreatCircle',
-          Start: waypoints[0],
-          Level: '3000',
-          Rules: 'Vfr',
-          PlannedFuel: '1.000000',
-        },
-        RhumbLineRoute: waypoints.slice(1).map((to) => ({
-          _attributes: { To: to, Level: 'MSL', LevelChange: 'B' },
-        })),
-        ReferencedAirfields: {},
-      },
-    },
-  };
-}
-
-function convertJsonToXml(json) {
-  return (
-    '<?xml version="1.0" encoding="utf-8"?>\n' +
-    xml2js.json2xml(json, { compact: true, spaces: 2 })
-  );
-}
-
-// Helper functions for conversion
-function convertDd2DMS(Dd) {
-  const sign = Math.sign(Dd);
-  const absDd = Math.abs(Dd);
-
-  const degree = Math.floor(absDd);
-  const minute = Math.floor((absDd - degree) * 60);
-  const second = ((absDd - degree) * 60 - minute) * 60;
-
-  return { degree: sign * degree, minute, second };
-}
-
-function convertLatitude(lat) {
-  if (typeof lat !== 'number' || lat < -90 || lat > 90) {
-    logError('Invalid latitude value');
-    return null;
-  }
-  const {
-    degree: latDegree,
-    minute: latMinute,
-    second: latSecond,
-  } = convertDd2DMS(lat);
-  const latDirection = lat >= 0 ? 'N' : 'S';
-
-  const latString = `${latDirection}${Math.abs(latDegree)
-    .toString()
-    .padStart(2, '0')}${latMinute.toString().padStart(2, '0')}${latSecond
-    .toFixed(2)
-    .toString()
-    .padStart(5, '0')}`;
-  return latString;
-}
-
-function convertLongitude(lon) {
-  if (typeof lon !== 'number' || lon < -180 || lon > 180) {
-    logError('Invalid longitude value');
-    return null;
-  }
-  const {
-    degree: lonDegree,
-    minute: lonMinute,
-    second: lonSecond,
-  } = convertDd2DMS(lon);
-  const lonDirection = lon >= 0 ? 'E' : 'W';
-  const lonString = `${lonDirection}${Math.abs(lonDegree)
-    .toString()
-    .padStart(3, '0')}${lonMinute.toString().padStart(2, '0')}${lonSecond
-    .toFixed(2)
-    .toString()
-    .padStart(5, '0')}`;
-  return lonString;
 }
 
 main().catch((err) => {

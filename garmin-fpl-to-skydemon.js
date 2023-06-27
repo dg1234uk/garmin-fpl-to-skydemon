@@ -31,9 +31,9 @@ async function writeFile(filePath, content) {
 }
 
 // Convert Decimal Degrees to Degrees, Minutes, Seconds
-function convertDd2DMS(Dd) {
-  const sign = Math.sign(Dd);
-  const absDd = Math.abs(Dd);
+function convertDd2DMS(decimalDegrees) {
+  const sign = Math.sign(decimalDegrees);
+  const absDd = Math.abs(decimalDegrees);
 
   const degree = Math.floor(absDd);
   const minute = Math.floor((absDd - degree) * 60);
@@ -132,7 +132,6 @@ function extractWaypoints(inputJson) {
       }
     }
   }
-
   return waypoints;
 }
 

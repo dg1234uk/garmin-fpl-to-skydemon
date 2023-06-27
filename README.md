@@ -2,16 +2,16 @@
 
 ## Overview
 
-This script is designed to process flight plan files, converting them from one XML format to another with necessary transformations. The script is written in JavaScript and designed to be executed using Node.js.
+This script is specifically designed to process Garmin flight plan files with the .fpl extension, converting them from Garmin's proprietary XML format to SkyDemon's XML format (.flightplan). The conversion involves reading XML content, validating the structure, extracting waypoints, and transforming them into a different format. The script is written in JavaScript and is intended to be executed using Node.js.
 
 ## How It Works
 
-1. The script reads flight plan files from a specified input directory. By default, it looks for files in the `./input` directory.
+1. The script reads Garin flight plan (.fpl) files from a specified input directory. By default, it looks for files in the `./input` directory.
 2. For each file, it reads the XML content and converts it to a JSON representation.
 3. It then validates the structure of the JSON to ensure it contains the expected fields.
 4. It extracts waypoints from the JSON, converting latitude and longitude from decimal degrees to a string representation in degrees, minutes, and seconds.
-5. The script constructs a new JSON structure with the extracted waypoints and converts it back to XML format.
-6. The newly constructed XML is then saved to a specified output directory. By default, it uses the `./output` directory.
+5. The script constructs a new JSON structure with the extracted waypoints and converts it to SkyDemon XML format.
+6. The newly constructed SkyDemon XML is then saved to a specified output directory. By default, it uses the `./output` directory.
 
 ## Dependencies
 
@@ -28,11 +28,11 @@ This script is designed to process flight plan files, converting them from one X
 3. Place the input files (with `.fpl` extension) in the input directory (default is `./input`).
 4. Run the script:
    ```
-   node <path_to_script>
+   node <path_to_script/garmin-fpl-to-skydemon.js>
    ```
    Optionally, you can specify custom input and output directories:
    ```
-   node <path_to_script> <input_directory> <output_directory>
+   node <path_to_script/garmin-fpl-to-skydemon.js> <input_directory> <output_directory>
    ```
 5. The processed files will be saved in the output directory (default is `./output`) with the `.flightplan` extension.
 

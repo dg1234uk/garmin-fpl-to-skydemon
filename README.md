@@ -1,4 +1,4 @@
-# README for Flight Plan File Processor
+# README for Garmin Flight Plan to Skydemon Flight Plan processor
 
 ## Overview
 

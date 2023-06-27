@@ -5,11 +5,12 @@ import path from 'path';
 const DEFAULT_INPUT_DIRECTORY = './input';
 const DEFAULT_OUTPUT_DIRECTORY = './output';
 
-// Helper functions
+// Helper function to log errors to console
 function logError(message) {
   console.error(message);
 }
 
+// Helper function to asynchronously read a file and return its contents
 async function readFile(filePath) {
   try {
     return await fs.promises.readFile(filePath, 'utf8');
@@ -19,6 +20,7 @@ async function readFile(filePath) {
   }
 }
 
+// Helper function to asynchronously write content to a file
 async function writeFile(filePath, content) {
   try {
     await fs.promises.writeFile(filePath, content, 'utf8');
@@ -28,6 +30,7 @@ async function writeFile(filePath, content) {
   }
 }
 
+// Convert Decimal Degrees to Degrees, Minutes, Seconds
 function convertDd2DMS(Dd) {
   const sign = Math.sign(Dd);
   const absDd = Math.abs(Dd);
@@ -39,7 +42,9 @@ function convertDd2DMS(Dd) {
   return { degree: sign * degree, minute, second };
 }
 
+// Convert latitude in decimal degrees to string format
 function convertLatitude(lat) {
+  // Validate latitude
   if (typeof lat !== 'number' || lat < -90 || lat > 90) {
     logError('Invalid latitude value');
     return null;
@@ -51,6 +56,7 @@ function convertLatitude(lat) {
   } = convertDd2DMS(lat);
   const latDirection = lat >= 0 ? 'N' : 'S';
 
+  // Convert and format latitude to string
   const latString = `${latDirection}${Math.abs(latDegree)
     .toString()
     .padStart(2, '0')}${latMinute.toString().padStart(2, '0')}${latSecond
@@ -60,7 +66,9 @@ function convertLatitude(lat) {
   return latString;
 }
 
+// Convert longitude in decimal degrees to string format
 function convertLongitude(lon) {
+  // Validate longitude
   if (typeof lon !== 'number' || lon < -180 || lon > 180) {
     logError('Invalid longitude value');
     return null;
@@ -71,6 +79,8 @@ function convertLongitude(lon) {
     second: lonSecond,
   } = convertDd2DMS(lon);
   const lonDirection = lon >= 0 ? 'E' : 'W';
+
+  // Convert and format longitude to string
   const lonString = `${lonDirection}${Math.abs(lonDegree)
     .toString()
     .padStart(3, '0')}${lonMinute.toString().padStart(2, '0')}${lonSecond
@@ -80,6 +90,7 @@ function convertLongitude(lon) {
   return lonString;
 }
 
+// Validates JSON structure to ensure it has the expected fields
 function isValidJsonStructure(inputJson) {
   return (
     inputJson &&

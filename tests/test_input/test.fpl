@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<flight-plan xmlns="http://www8.garmin.com/xmlschemas/FlightPlan/v1">
+  <created>2023-06-22T12:50:18Z</created>
+
+  <waypoint-table>
+    <waypoint>
+      <identifier>A01</identifier>
+      <type>USER WAYPOINT</type>
+      <country-code>__</country-code>
+      <lat>53.8396</lat>
+      <lon>-2.7952</lon>
+      <comment></comment>
+    </waypoint>
+    <waypoint>
+      <identifier>A02</identifier>
+      <type>USER WAYPOINT</type>
+      <country-code>__</country-code>
+      <lat>53.7969</lat>
+      <lon>-2.7233</lon>
+      <comment></comment>
+    </waypoint>
+    <waypoint>
+      <identifier>A03</identifier>
+      <type>USER WAYPOINT</type>
+      <country-code>__</country-code>
+      <lat>53.7388</lat>
+      <lon>-2.6972</lon>
+      <comment></comment>
+    </waypoint>
+  </waypoint-table>
+
+  <route>
+   <route-name>ARC</route-name>
+   <flight-plan-index>50</flight-plan-index>
+
+   <route-point>
+      <waypoint-identifier>A01</waypoint-identifier>
+      <waypoint-type>USER WAYPOINT</waypoint-type>
+      <waypoint-country-code>__</waypoint-country-code>
+   </route-point>
+   <route-point>
+      <waypoint-identifier>A02</waypoint-identifier>
+      <waypoint-type>USER WAYPOINT</waypoint-type>
+      <waypoint-country-code>__</waypoint-country-code>
+   </route-point>
+   <route-point>
+      <waypoint-identifier>A03</waypoint-identifier>
+      <waypoint-type>USER WAYPOINT</waypoint-type>
+      <waypoint-country-code>__</waypoint-country-code>
+   </route-point>
+   <route-point>
+      <waypoint-identifier>A01</waypoint-identifier>
+      <waypoint-type>USER WAYPOINT</waypoint-type>
+      <waypoint-country-code>__</waypoint-country-code>
+   </route-point>
+ </route>
+</flight-plan>

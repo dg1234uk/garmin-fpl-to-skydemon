@@ -170,6 +170,76 @@ test('isValidJsonStructure validates JSON structure', () => {
   );
 });
 
+test('should return false for null input', () => {
+  expect(isValidJsonStructure(null)).toBe(false);
+});
+
+test('should return false for empty object', () => {
+  expect(isValidJsonStructure({})).toBe(false);
+});
+
+test('should return false for missing flight-plan', () => {
+  expect(isValidJsonStructure({ randomKey: {} })).toBe(false);
+});
+
+test('should return false for missing route in flight-plan', () => {
+  expect(isValidJsonStructure({ 'flight-plan': {} })).toBe(false);
+});
+
+test('should return false for missing route-point in flight-plan route', () => {
+  expect(isValidJsonStructure({ 'flight-plan': { route: {} } })).toBe(false);
+});
+
+test('should return false for missing waypoint-table in flight-plan', () => {
+  expect(
+    isValidJsonStructure({ 'flight-plan': { route: { 'route-point': [] } } })
+  ).toBe(false);
+});
+
+test('should return false for missing waypoint in waypoint-table', () => {
+  expect(
+    isValidJsonStructure({
+      'flight-plan': { 'waypoint-table': {}, route: { 'route-point': [] } },
+    })
+  ).toBe(false);
+});
+
+test('should return false for non-array waypoint', () => {
+  expect(
+    isValidJsonStructure({
+      'flight-plan': {
+        'waypoint-table': { waypoint: {} },
+        route: { 'route-point': [] },
+      },
+    })
+  ).toBe(false);
+});
+
+test('should return false for non-array route-point', () => {
+  expect(
+    isValidJsonStructure({
+      'flight-plan': {
+        'waypoint-table': { waypoint: [] },
+        route: { 'route-point': {} },
+      },
+    })
+  ).toBe(false);
+});
+
+test('should return true for valid input structure', () => {
+  const validInput = {
+    'flight-plan': {
+      route: {
+        'route-point': [],
+      },
+      'waypoint-table': {
+        waypoint: [],
+      },
+    },
+  };
+  expect(isValidJsonStructure(validInput)).toBe(true);
+});
+
 // Test: extractWaypoints function
 test('extractWaypoints extracts waypoints from JSON', () => {
   const inputJson = {

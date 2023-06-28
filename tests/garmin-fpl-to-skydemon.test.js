@@ -1,4 +1,4 @@
-import { assert, describe, test } from 'vitest';
+import { assert, expect, test } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import {
@@ -12,19 +12,7 @@ import {
   processFile,
   ensureDirectoryExists,
 } from '../garmin-fpl-to-skydemon';
-
-// Test: convertDd2DMS function
-test('convertDd2DMS converts decimal degrees to DMS correctly', () => {
-  const decimalDegrees = 45.6789;
-  const { degree, minute, second } = convertDd2DMS(decimalDegrees);
-
-  assert.strictEqual(degree, 45, 'Degree should be 45');
-  assert.strictEqual(minute, 40, 'Minute should be 40');
-  assert.ok(
-    Math.abs(second - 44.04) < 0.01,
-    'Second should be approximately 44.04'
-  );
-});
+import exp from 'constants';
 
 // Test: readFile function with a valid file
 test('readFile reads file correctly', async () => {
@@ -57,6 +45,42 @@ test('convertLatitude formats latitude correctly', () => {
   );
 });
 
+// Test: Convert Latitude function
+test('convertLatitude formats - boundary value correctly', () => {
+  const latitude = -90;
+  const formatted = convertLatitude(latitude);
+  assert.strictEqual(
+    formatted,
+    'S900000.00',
+    'Latitude should be formatted as S900000.00'
+  );
+});
+
+// Test: Convert Latitude function
+test('convertLatitude formats + boundary value correctly', () => {
+  const latitude = +90;
+  const formatted = convertLatitude(latitude);
+  assert.strictEqual(
+    formatted,
+    'N900000.00',
+    'Latitude should be formatted as N900000.00'
+  );
+});
+
+// Test: Convert Latitude function
+test('convertLatitude handles error for invalid values', () => {
+  const latitude = 90.712776;
+  const formatted = convertLatitude(latitude);
+  assert.strictEqual(formatted, null, 'Latitude should be null');
+});
+
+// Test: Convert Latitude function
+test('convertLatitude handles error for invalid values', () => {
+  const latitude = -100.392;
+  const formatted = convertLatitude(latitude);
+  assert.strictEqual(formatted, null, 'Latitude should be null');
+});
+
 // Test: Convert Longitude function
 test('convertLongitude formats longitude correctly', () => {
   const longitude = -74.005974;
@@ -65,6 +89,55 @@ test('convertLongitude formats longitude correctly', () => {
     formatted,
     'W0740021.51',
     'Longitude should be formatted as W0740021.51'
+  );
+});
+
+// Test: Convert Longitude function
+test('convertLongitude formats - boundary value correctly', () => {
+  const longitude = -180;
+  const formatted = convertLongitude(longitude);
+  assert.strictEqual(
+    formatted,
+    'W1800000.00',
+    'Longitude should be formatted as W1800000.00'
+  );
+});
+
+// Test: Convert Longitude function
+test('convertLongitude formats + boundary value correctly', () => {
+  const longitude = +180;
+  const formatted = convertLongitude(longitude);
+  assert.strictEqual(
+    formatted,
+    'E1800000.00',
+    'Longitude should be formatted as E1800000.00'
+  );
+});
+
+// Test: Convert Longitude function
+test('convertLongitude handles error for invalid values', () => {
+  const longitude = -180.005974;
+  const formatted = convertLongitude(longitude);
+  assert.strictEqual(formatted, null, 'Longitude should be null');
+});
+
+// Test: Convert Longitude function
+test('convertLongitude handles error for invalid values', () => {
+  const longitude = 181.974;
+  const formatted = convertLongitude(longitude);
+  assert.strictEqual(formatted, null, 'Longitude should be null');
+});
+
+// Test: convertDd2DMS function
+test('convertDd2DMS converts decimal degrees to DMS correctly', () => {
+  const decimalDegrees = 45.6789;
+  const { degree, minute, second } = convertDd2DMS(decimalDegrees);
+
+  assert.strictEqual(degree, 45, 'Degree should be 45');
+  assert.strictEqual(minute, 40, 'Minute should be 40');
+  assert.ok(
+    Math.abs(second - 44.04) < 0.01,
+    'Second should be approximately 44.04'
   );
 });
 
@@ -95,6 +168,76 @@ test('isValidJsonStructure validates JSON structure', () => {
     false,
     'Should be false for invalid JSON structure'
   );
+});
+
+test('should return false for null input', () => {
+  expect(isValidJsonStructure(null)).toBe(false);
+});
+
+test('should return false for empty object', () => {
+  expect(isValidJsonStructure({})).toBe(false);
+});
+
+test('should return false for missing flight-plan', () => {
+  expect(isValidJsonStructure({ randomKey: {} })).toBe(false);
+});
+
+test('should return false for missing route in flight-plan', () => {
+  expect(isValidJsonStructure({ 'flight-plan': {} })).toBe(false);
+});
+
+test('should return false for missing route-point in flight-plan route', () => {
+  expect(isValidJsonStructure({ 'flight-plan': { route: {} } })).toBe(false);
+});
+
+test('should return false for missing waypoint-table in flight-plan', () => {
+  expect(
+    isValidJsonStructure({ 'flight-plan': { route: { 'route-point': [] } } })
+  ).toBe(false);
+});
+
+test('should return false for missing waypoint in waypoint-table', () => {
+  expect(
+    isValidJsonStructure({
+      'flight-plan': { 'waypoint-table': {}, route: { 'route-point': [] } },
+    })
+  ).toBe(false);
+});
+
+test('should return false for non-array waypoint', () => {
+  expect(
+    isValidJsonStructure({
+      'flight-plan': {
+        'waypoint-table': { waypoint: {} },
+        route: { 'route-point': [] },
+      },
+    })
+  ).toBe(false);
+});
+
+test('should return false for non-array route-point', () => {
+  expect(
+    isValidJsonStructure({
+      'flight-plan': {
+        'waypoint-table': { waypoint: [] },
+        route: { 'route-point': {} },
+      },
+    })
+  ).toBe(false);
+});
+
+test('should return true for valid input structure', () => {
+  const validInput = {
+    'flight-plan': {
+      route: {
+        'route-point': [],
+      },
+      'waypoint-table': {
+        waypoint: [],
+      },
+    },
+  };
+  expect(isValidJsonStructure(validInput)).toBe(true);
 });
 
 // Test: extractWaypoints function
@@ -164,4 +307,27 @@ test('processFile processes a file correctly', async () => {
   const stats = await fs.promises.stat(outputFile);
 
   assert.ok(stats.isFile(), 'Output file should be created');
+});
+
+test('should create an output file with the correct content', async () => {
+  const inputDirectory = './tests/test_input';
+  const outputDirectory = './tests/test_output';
+  const file = 'test.fpl';
+
+  await processFile(inputDirectory, outputDirectory, file);
+
+  const outputFile = path.join(outputDirectory, 'test.flightplan');
+  const content = await fs.promises.readFile(outputFile, 'utf8');
+
+  const expectedContent = `<?xml version="1.0" encoding="utf-8"?>
+<DivelementsFlightPlanner>
+  <PrimaryRoute CourseType="GreatCircle" Start="N535022.56 W0024742.72" Level="3000" Rules="Vfr" PlannedFuel="1.000000">
+    <RhumbLineRoute To="N534748.84 W0024323.88" Level="MSL" LevelChange="B"/>
+    <RhumbLineRoute To="N534419.68 W0024149.92" Level="MSL" LevelChange="B"/>
+    <RhumbLineRoute To="N535022.56 W0024742.72" Level="MSL" LevelChange="B"/>
+    <ReferencedAirfields/>
+  </PrimaryRoute>
+</DivelementsFlightPlanner>`;
+
+  expect(content).toEqual(expectedContent);
 });

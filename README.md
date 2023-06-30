@@ -1,62 +1,92 @@
-# README for Garmin Flight Plan to Skydemon Flight Plan processor
+# Garmin Flight Plan to SkyDemon
 
-## Overview
+This repository contains two Node.js tools for Garmin flight plan conversion:
 
-This script is specifically designed to process Garmin flight plan files with the .fpl extension, converting them from Garmin's proprietary XML format to SkyDemon's XML format (.flightplan). The conversion involves reading XML content, validating the structure, extracting waypoints, and transforming them into a different format. The script is written in JavaScript and is intended to be executed using Node.js.
+1. `garmin-fpl-to-skydemon-wpts.js` - Converts waypoints from Garmin FPL files (`.fpl`) into SkyDemon waypoint files (`.gpx`).
+2. `garmin-fpl-to-skydemon-fpl.js` - Transforms Garmin FPL files into SkyDemon Flight Plan files (`.flightplan`).
 
-## How It Works
+Both tools operate by reading input files from a specified directory, processing each file, and then writing the results to an output directory.
 
-1. The script reads Garin flight plan (.fpl) files from a specified input directory. By default, it looks for files in the `./input` directory.
-2. For each file, it reads the XML content and converts it to a JSON representation.
-3. It then validates the structure of the JSON to ensure it contains the expected fields.
-4. It extracts waypoints from the JSON, converting latitude and longitude from decimal degrees to a string representation in degrees, minutes, and seconds.
-5. The script constructs a new JSON structure with the extracted waypoints and converts it to SkyDemon XML format.
-6. The newly constructed SkyDemon XML is then saved to a specified output directory. By default, it uses the `./output` directory.
+## Getting Started
 
-## Dependencies
+To utilize these tools, ensure you have Node.js installed on your system. Then, clone the repository and install the necessary dependencies.
 
-- Node.js: Make sure you have Node.js installed on your system.
-- xml2js: This library is used to convert between XML and JSON formats.
+```bash
+git clone https://github.com/dg1234uk/garmin-fpl-to-skydemon.git
+cd <repository-directory>
+npm install
+```
 
 ## Usage
 
-1. First, ensure that Node.js is installed on your system.
-2. Install the npm packages:
-   ```
-   npm install
-   ```
-3. Place the input files (with `.fpl` extension) in the input directory (default is `./input`).
-4. Run the script:
-   ```
-   node <path_to_script/garmin-fpl-to-skydemon.js>
-   ```
-   Optionally, you can specify custom input and output directories:
-   ```
-   node <path_to_script/garmin-fpl-to-skydemon.js> <input_directory> <output_directory>
-   ```
-5. The processed files will be saved in the output directory (default is `./output`) with the `.flightplan` extension.
+Both scripts are designed to operate independently. Each script accepts optional arguments specifying the input and output directories. In the absence of these arguments, they default to `./input` and `./output` respectively.
 
-## Functions Description
+Run the Garmin to SkyDemon waypoints conversion script with:
 
-- `logError`: Helper function to log error messages to the console.
-- `readFile`: Asynchronously reads a file and returns its contents.
-- `writeFile`: Asynchronously writes content to a file.
-- `convertDd2DMS`: Converts decimal degrees to degrees, minutes, and seconds representation.
-- `convertLatitude`: Converts latitude in decimal degrees to string format (degrees, minutes, seconds).
-- `convertLongitude`: Converts longitude in decimal degrees to string format (degrees, minutes, seconds).
-- `isValidJsonStructure`: Validates the JSON structure to ensure it has the expected fields.
-- `extractWaypoints`: Extracts waypoints from the input JSON structure.
-- `constructOutputJson`: Constructs the output JSON structure from the extracted waypoints.
+```bash
+node garmin-fpl-to-skydemon-wpts.js [inputDirectory] [outputDirectory]
+```
+
+Run the Garmin to SkyDemon Flight Plan conversion script with:
+
+```bash
+node garmin-fpl-to-skydemon-fpl.js [inputDirectory] [outputDirectory]
+```
+
+## garmin-fpl-to-skydemon-wpts.js
+
+This tool transforms waypoints from Garmin FPL files (`.fpl`) to SkyDemon waypoint files (`.gpx`). During the conversion process, it removes duplicate waypoints and sorts them alphabetically by name.
+
+Key functions of this script include:
+
+- `convertXmlToJson`: Transforms a Garmin FPL file in XML format to JSON.
+- `extractWaypoints`: Extracts waypoints from the converted JSON.
+- `removeDuplicates`: Removes duplicate waypoints from the extracted waypoints.
+- `sortWaypoints`: Sorts waypoints alphabetically by name.
+- `constructOutputJson`: Constructs output JSON from the processed waypoints.
+- `processFile`: Core function that processes each individual file.
+- `main`: Orchestrates the file processing pipeline.
+
+This script has robust error handling, logging errors during XML to JSON conversion, JSON structure validation, and halting file processing if necessary.
+
+## garmin-fpl-to-skydemon-fpl.js
+
+This script converts Garmin FPL files (`.fpl`) from Garmin's proprietary XML format to SkyDemon's XML format (`.flightplan`). The conversion process involves reading XML content, validating its structure, extracting waypoints, and transforming them into a different format.
+
+Key functions of this script include:
+
 - `convertJsonToXml`: Converts a JSON object to an XML string.
-- `ensureDirectoryExists`: Ensures that the specified directory exists.
-- `getInputFiles`: Gets a list of input files from a directory.
-- `processFile`: Core function to process an individual file.
-- `main`: Main function that starts the file processing.
+- `extractWaypoints`: Extracts waypoints from the converted JSON.
+- `constructOutputJson`: Constructs output JSON from the extracted waypoints.
+- `processFile`: Core function that processes each individual file.
+- `processFiles`: Processes all files in the input directory.
+- `main`: Orchestrates the file processing pipeline.
 
-## Error Handling
+This script also logs errors to the console if there are issues with file reading or writing, XML parsing, or JSON structure validation.
 
-The script logs errors to the console if there is an issue reading or writing files, if the input XML cannot be parsed, or if the JSON structure is not as expected.
+## Dependencies
 
-## Note
+Both scripts rely on Node.js and the `xml2js` library for XML and JSON conversions. They also use a `utils.js` utility module providing helper functions for ensuring directory existence, file extension filtering, file reading and writing, and error logging.
 
-This script assumes that the input files have a specific structure. If the input files are not formatted as expected, the script may not work correctly.
+### `utils.js`
+
+The utility module includes the following key functions:
+
+- `logError`: Logs error messages to the console.
+- `readFile`: Reads a file asynchronously and returns its contents.
+- `writeFile`: Writes content to a file asynchronously.
+- `getInputFiles`: Retrieves a list of input files from a directory.
+- `convertDd2DMS`: Converts decimal degrees to degrees, minutes, and seconds representation.
+- `convertLatitude`: Converts latitude from decimal degrees to string format (degrees, minutes, seconds).
+- `convertLongitude`: Converts longitude from decimal degrees to string format (degrees, minutes, seconds).
+- `isValidGarminFplJsonStructure`: Validates the structure of a JSON object to ensure it has the required fields.
+- `filterFilesByExtension`: Filters a list of files based on their extension.
+- `ensureDirectoryExists`: Ensures a given directory exists.
+
+## Contributing
+
+Your contributions are welcomed and appreciated. Please feel free to improve these tools by opening issues or submitting pull requests. All feedback and code improvements are valuable.
+
+## Important Note
+
+These scripts are designed to process input files with specific structures. If your input files do not adhere to the expected formats, the scripts may fail to work correctly. Always ensure your files are formatted correctly for the best results.

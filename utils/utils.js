@@ -123,14 +123,6 @@ export function isValidGarminFplJsonStructure(inputJson) {
   return true;
 }
 
-// Converts JSON to XML format
-export function convertJsonToXml(json) {
-  return (
-    '<?xml version="1.0" encoding="utf-8"?>\n' +
-    xml2js.json2xml(json, { compact: true, spaces: 2 })
-  );
-}
-
 // Helper function to get a list of input files from a directory
 export async function getInputFiles(inputDirectory) {
   try {

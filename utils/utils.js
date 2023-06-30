@@ -1,5 +1,5 @@
 import fs from 'fs';
-import xml2js from 'xml-js';
+import path from 'path';
 
 // Helper function to log errors to console
 export function logError(message) {
@@ -24,6 +24,20 @@ export async function writeFile(filePath, content) {
   } catch (err) {
     logError(`Error writing the file: ${err}`);
   }
+}
+
+// Helper function to filter list of files by extension
+export function filterFilesByExtension(files, extension) {
+  return files.filter((file) => {
+    const fileExtension = path.extname(file).toLowerCase();
+    const isMatch = fileExtension === extension;
+    if (!isMatch) {
+      logError(
+        `Filtered out ${file} due to mismatched extension. Expected: ${extension}, but got: ${fileExtension}`
+      );
+    }
+    return isMatch;
+  });
 }
 
 // Convert Decimal Degrees to Degrees, Minutes, Seconds

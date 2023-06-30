@@ -9,6 +9,7 @@ import {
   isValidGarminFplJsonStructure,
   getInputFiles,
   ensureDirectoryExists,
+  filterFilesByExtension,
 } from './utils/utils.js';
 
 const DEFAULT_INPUT_DIRECTORY = './input';
@@ -85,12 +86,6 @@ export function constructOutputJson(waypoints) {
 export async function processFile(inputDirectory, outputDirectory, file) {
   const inputFile = path.join(inputDirectory, file);
 
-  // Skip non .fpl files
-  if (path.extname(file).toLowerCase() !== '.fpl') {
-    logError(`Skipping non-fpl file: ${file}`);
-    return;
-  }
-
   // Read input file
   const inputXml = await readFile(inputFile);
   if (!inputXml) return;
@@ -144,6 +139,7 @@ async function main() {
 
   // Get the list of files and process each file
   const files = await getInputFiles(inputDirectory);
+  const fplFiles = filterFilesByExtension(files, '.fpl');
   for (const file of files) {
     await processFile(inputDirectory, outputDirectory, file);
   }
@@ -151,5 +147,6 @@ async function main() {
 
 // Start the program and catch any top-level errors
 main().catch((err) => {
-  logError('An error occurred:', err.message);
+  const errorMessage = err.message || 'An unknown error occurred';
+  logError('An error occurred:', errorMessage);
 });

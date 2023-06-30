@@ -7,12 +7,12 @@ import {
   convertLatitude,
   convertLongitude,
   isValidGarminFplJsonStructure,
+  ensureDirectoryExists,
 } from '../utils/utils.js';
 import {
   extractWaypoints,
   constructOutputJson,
   processFile,
-  ensureDirectoryExists,
 } from '../garmin-fpl-to-skydemon-fpl';
 
 // Test: readFile function with a valid file

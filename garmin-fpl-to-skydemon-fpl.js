@@ -1,4 +1,5 @@
 import path from 'path';
+import xml2js from 'xml-js';
 import {
   logError,
   readFile,
@@ -6,13 +7,20 @@ import {
   convertLatitude,
   convertLongitude,
   isValidGarminFplJsonStructure,
-  convertJsonToXml,
   getInputFiles,
   ensureDirectoryExists,
 } from './utils/utils.js';
 
 const DEFAULT_INPUT_DIRECTORY = './input';
 const DEFAULT_OUTPUT_DIRECTORY = './output';
+
+// Converts JSON to XML format
+export function convertJsonToXml(json) {
+  return (
+    '<?xml version="1.0" encoding="utf-8"?>\n' +
+    xml2js.json2xml(json, { compact: true, spaces: 2 })
+  );
+}
 
 // Extracts waypoints from input JSON
 export function extractWaypoints(inputJson) {

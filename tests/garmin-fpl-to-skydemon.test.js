@@ -12,7 +12,6 @@ import {
   processFile,
   ensureDirectoryExists,
 } from '../garmin-fpl-to-skydemon';
-import exp from 'constants';
 
 // Test: readFile function with a valid file
 test('readFile reads file correctly', async () => {

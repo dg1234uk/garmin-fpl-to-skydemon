@@ -13,6 +13,8 @@ import {
 const DEFAULT_INPUT_DIRECTORY = './input';
 const DEFAULT_OUTPUT_DIRECTORY = './output';
 
+// Convert XML to JSON
+// If the XML is invalid, log an error and return null
 export function convertXmlToJson(inputXml, file) {
   try {
     const inputJson = JSON.parse(xml2js.xml2json(inputXml, { compact: true }));
@@ -84,6 +86,7 @@ export function constructOutputJson(waypoints) {
 }
 
 // Core function to process a single file
+// Reads the file, converts it to JSON, validates the structure, and extracts waypoints
 async function processFile(inputDirectory, file) {
   const inputFile = path.join(inputDirectory, file);
 
@@ -105,18 +108,10 @@ async function processFile(inputDirectory, file) {
   return waypoints;
 }
 
-async function main() {
-  // Set input and output directories from command-line arguments or use defaults
-  const [
-    inputDirectory = DEFAULT_INPUT_DIRECTORY,
-    outputDirectory = DEFAULT_OUTPUT_DIRECTORY,
-  ] = process.argv.slice(2);
-
-  // Ensure directories exist
-  await ensureDirectoryExists(inputDirectory);
-  await ensureDirectoryExists(outputDirectory, true);
-
-  // Get the list of files and process each file
+// Process all files in the input directory
+// Filters for .fpl files, processes them, removes duplicate waypoints, sorts waypoints,
+// constructs output JSON, converts it back to XML, and writes it to a file in the output directory
+export async function processFiles(inputDirectory, outputDirectory) {
   const files = await getInputFiles(inputDirectory);
 
   const fplFiles = filterFilesByExtension(files, '.fpl');
@@ -143,6 +138,23 @@ async function main() {
   const outputFilePath = path.join(outputDirectory, 'waypoints.gpx');
 
   await writeFile(outputFilePath, outputXml);
+}
+
+// Main function to start the program
+// Sets input and output directories, ensures they exist, and processes the files
+async function main() {
+  // Set input and output directories from command-line arguments or use defaults
+  const [
+    inputDirectory = DEFAULT_INPUT_DIRECTORY,
+    outputDirectory = DEFAULT_OUTPUT_DIRECTORY,
+  ] = process.argv.slice(2);
+
+  // Ensure directories exist
+  await ensureDirectoryExists(inputDirectory);
+  await ensureDirectoryExists(outputDirectory, true);
+
+  // Get the list of files and process each file
+  await processFiles(inputDirectory, outputDirectory);
 }
 
 // Start the program and catch any top-level errors

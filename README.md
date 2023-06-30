@@ -59,6 +59,7 @@ Key functions of this script include:
 - `extractWaypoints`: Extracts waypoints from the converted JSON.
 - `constructOutputJson`: Constructs output JSON from the extracted waypoints.
 - `processFile`: Core function that processes each individual file.
+- `processFiles`: Processes all files in the input directory.
 - `main`: Orchestrates the file processing pipeline.
 
 This script also logs errors to the console if there are issues with file reading or writing, XML parsing, or JSON structure validation.

@@ -6,12 +6,14 @@ import {
   convertDd2DMS,
   convertLatitude,
   convertLongitude,
-  isValidJsonStructure,
+  isValidGarminFplJsonStructure,
+} from '../utils/utils.js';
+import {
   extractWaypoints,
   constructOutputJson,
   processFile,
   ensureDirectoryExists,
-} from '../garmin-fpl-to-skydemon';
+} from '../garmin-fpl-to-skydemon-fpl';
 
 // Test: readFile function with a valid file
 test('readFile reads file correctly', async () => {
@@ -158,46 +160,50 @@ test('isValidJsonStructure validates JSON structure', () => {
   };
 
   assert.strictEqual(
-    isValidJsonStructure(validJson),
+    isValidGarminFplJsonStructure(validJson),
     true,
     'Should be true for valid JSON structure'
   );
   assert.strictEqual(
-    isValidJsonStructure(invalidJson),
+    isValidGarminFplJsonStructure(invalidJson),
     false,
     'Should be false for invalid JSON structure'
   );
 });
 
 test('should return false for null input', () => {
-  expect(isValidJsonStructure(null)).toBe(false);
+  expect(isValidGarminFplJsonStructure(null)).toBe(false);
 });
 
 test('should return false for empty object', () => {
-  expect(isValidJsonStructure({})).toBe(false);
+  expect(isValidGarminFplJsonStructure({})).toBe(false);
 });
 
 test('should return false for missing flight-plan', () => {
-  expect(isValidJsonStructure({ randomKey: {} })).toBe(false);
+  expect(isValidGarminFplJsonStructure({ randomKey: {} })).toBe(false);
 });
 
 test('should return false for missing route in flight-plan', () => {
-  expect(isValidJsonStructure({ 'flight-plan': {} })).toBe(false);
+  expect(isValidGarminFplJsonStructure({ 'flight-plan': {} })).toBe(false);
 });
 
 test('should return false for missing route-point in flight-plan route', () => {
-  expect(isValidJsonStructure({ 'flight-plan': { route: {} } })).toBe(false);
+  expect(isValidGarminFplJsonStructure({ 'flight-plan': { route: {} } })).toBe(
+    false
+  );
 });
 
 test('should return false for missing waypoint-table in flight-plan', () => {
   expect(
-    isValidJsonStructure({ 'flight-plan': { route: { 'route-point': [] } } })
+    isValidGarminFplJsonStructure({
+      'flight-plan': { route: { 'route-point': [] } },
+    })
   ).toBe(false);
 });
 
 test('should return false for missing waypoint in waypoint-table', () => {
   expect(
-    isValidJsonStructure({
+    isValidGarminFplJsonStructure({
       'flight-plan': { 'waypoint-table': {}, route: { 'route-point': [] } },
     })
   ).toBe(false);
@@ -205,7 +211,7 @@ test('should return false for missing waypoint in waypoint-table', () => {
 
 test('should return false for non-array waypoint', () => {
   expect(
-    isValidJsonStructure({
+    isValidGarminFplJsonStructure({
       'flight-plan': {
         'waypoint-table': { waypoint: {} },
         route: { 'route-point': [] },
@@ -216,7 +222,7 @@ test('should return false for non-array waypoint', () => {
 
 test('should return false for non-array route-point', () => {
   expect(
-    isValidJsonStructure({
+    isValidGarminFplJsonStructure({
       'flight-plan': {
         'waypoint-table': { waypoint: [] },
         route: { 'route-point': {} },
@@ -236,7 +242,7 @@ test('should return true for valid input structure', () => {
       },
     },
   };
-  expect(isValidJsonStructure(validInput)).toBe(true);
+  expect(isValidGarminFplJsonStructure(validInput)).toBe(true);
 });
 
 // Test: extractWaypoints function

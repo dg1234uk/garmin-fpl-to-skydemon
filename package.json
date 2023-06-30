@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node garmin-fpl-to-skydemon.js",
+    "start": "npm run fpl",
+    "fpl": "node garmin-fpl-to-skydemon-fpl.js",
+    "wpts": "node garmin-fpl-to-skydemon-wpts.js",
     "test": "vitest",
     "coverage": "vitest run --coverage"
   },

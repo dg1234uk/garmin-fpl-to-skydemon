@@ -1,5 +1,3 @@
-import fs from 'fs';
-import xml2js from 'xml-js';
 import path from 'path';
 import {
   logError,
@@ -8,6 +6,9 @@ import {
   convertLatitude,
   convertLongitude,
   isValidGarminFplJsonStructure,
+  convertJsonToXml,
+  getInputFiles,
+  ensureDirectoryExists,
 } from './utils/utils.js';
 
 const DEFAULT_INPUT_DIRECTORY = './input';
@@ -70,47 +71,6 @@ export function constructOutputJson(waypoints) {
       },
     },
   };
-}
-
-// Converts JSON to XML format
-function convertJsonToXml(json) {
-  return (
-    '<?xml version="1.0" encoding="utf-8"?>\n' +
-    xml2js.json2xml(json, { compact: true, spaces: 2 })
-  );
-}
-
-// Core function to ensure that the specified directory exists
-export async function ensureDirectoryExists(
-  directoryPath,
-  createIfNotExist = false
-) {
-  try {
-    await fs.promises.access(directoryPath);
-    const stats = await fs.promises.stat(directoryPath);
-    if (!stats.isDirectory()) {
-      throw new Error(`Path is not a directory: ${directoryPath}`);
-    }
-  } catch (err) {
-    if (err.code === 'ENOENT') {
-      if (createIfNotExist) {
-        await fs.promises.mkdir(directoryPath, { recursive: true });
-      } else {
-        throw new Error(`Directory does not exist: ${directoryPath}`);
-      }
-    } else {
-      throw new Error(`Error accessing the directory: ${err}`);
-    }
-  }
-}
-
-// Core function to get a list of input files from a directory
-async function getInputFiles(inputDirectory) {
-  try {
-    return await fs.promises.readdir(inputDirectory);
-  } catch (err) {
-    throw new Error(`Error reading directory: ${err}`);
-  }
 }
 
 // Core function to process an individual file

@@ -1,4 +1,5 @@
 import fs from 'fs';
+import xml2js from 'xml-js';
 
 // Helper function to log errors to console
 export function logError(message) {
@@ -120,4 +121,45 @@ export function isValidGarminFplJsonStructure(inputJson) {
   }
 
   return true;
+}
+
+// Converts JSON to XML format
+export function convertJsonToXml(json) {
+  return (
+    '<?xml version="1.0" encoding="utf-8"?>\n' +
+    xml2js.json2xml(json, { compact: true, spaces: 2 })
+  );
+}
+
+// Helper function to get a list of input files from a directory
+export async function getInputFiles(inputDirectory) {
+  try {
+    return await fs.promises.readdir(inputDirectory);
+  } catch (err) {
+    throw new Error(`Error reading directory: ${err}`);
+  }
+}
+
+// Core function to ensure that the specified directory exists
+export async function ensureDirectoryExists(
+  directoryPath,
+  createIfNotExist = false
+) {
+  try {
+    await fs.promises.access(directoryPath);
+    const stats = await fs.promises.stat(directoryPath);
+    if (!stats.isDirectory()) {
+      throw new Error(`Path is not a directory: ${directoryPath}`);
+    }
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      if (createIfNotExist) {
+        await fs.promises.mkdir(directoryPath, { recursive: true });
+      } else {
+        throw new Error(`Directory does not exist: ${directoryPath}`);
+      }
+    } else {
+      throw new Error(`Error accessing the directory: ${err}`);
+    }
+  }
 }

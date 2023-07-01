@@ -1,5 +1,5 @@
-import path from 'path';
-import xml2js from 'xml-js';
+import path from "path";
+import xml2js from "xml-js";
 import {
   logError,
   readFile,
@@ -10,45 +10,44 @@ import {
   getInputFiles,
   ensureDirectoryExists,
   filterFilesByExtension,
-} from './utils/utils.js';
+} from "./utils/utils.js";
 
-const DEFAULT_INPUT_DIRECTORY = './input';
-const DEFAULT_OUTPUT_DIRECTORY = './output';
+const DEFAULT_INPUT_DIRECTORY = "./input";
+const DEFAULT_OUTPUT_DIRECTORY = "./output";
 
 // Converts JSON to XML format
 export function convertJsonToXml(json) {
-  return (
-    '<?xml version="1.0" encoding="utf-8"?>\n' +
-    xml2js.json2xml(json, { compact: true, spaces: 2 })
-  );
+  return `<?xml version="1.0" encoding="utf-8"?>\n${xml2js.json2xml(json, {
+    compact: true,
+    spaces: 2,
+  })}`;
 }
 
 // Extracts waypoints from input JSON
 export function extractWaypoints(inputJson) {
-  const routePoints = inputJson['flight-plan']['route']['route-point'];
+  const routePoints = inputJson["flight-plan"].route["route-point"];
   if (!Array.isArray(routePoints)) {
     return null;
   }
 
-  const waypointTable = inputJson['flight-plan']['waypoint-table']['waypoint'];
+  const waypointTable = inputJson["flight-plan"]["waypoint-table"].waypoint;
   const waypoints = [];
 
   // Loop through route points and extract waypoints
-  for (const point of routePoints) {
+  routePoints.forEach((point) => {
     const waypointIdentifier =
-      point['waypoint-identifier'] && point['waypoint-identifier']['_text'];
+      point["waypoint-identifier"] && point["waypoint-identifier"]._text;
 
     const waypoint = waypointTable.find(
-      (wp) =>
-        wp['identifier'] && wp['identifier']['_text'] === waypointIdentifier
+      (wp) => wp.identifier && wp.identifier._text === waypointIdentifier
     );
 
     // Extract latitude and longitude
-    if (waypoint && waypoint['lat'] && waypoint['lon']) {
-      const lat = parseFloat(waypoint['lat']['_text']);
-      const lon = parseFloat(waypoint['lon']['_text']);
+    if (waypoint && waypoint.lat && waypoint.lon) {
+      const lat = parseFloat(waypoint.lat._text);
+      const lon = parseFloat(waypoint.lon._text);
 
-      if (!isNaN(lat) && !isNaN(lon)) {
+      if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
         const latString = convertLatitude(lat);
         const lonString = convertLongitude(lon);
 
@@ -57,7 +56,7 @@ export function extractWaypoints(inputJson) {
         }
       }
     }
-  }
+  });
   return waypoints;
 }
 
@@ -67,14 +66,14 @@ export function constructOutputJson(waypoints) {
     DivelementsFlightPlanner: {
       PrimaryRoute: {
         _attributes: {
-          CourseType: 'GreatCircle',
+          CourseType: "GreatCircle",
           Start: waypoints[0],
-          Level: '3000',
-          Rules: 'Vfr',
-          PlannedFuel: '1.000000',
+          Level: "3000",
+          Rules: "Vfr",
+          PlannedFuel: "1.000000",
         },
         RhumbLineRoute: waypoints.slice(1).map((to) => ({
-          _attributes: { To: to, Level: 'MSL', LevelChange: 'B' },
+          _attributes: { To: to, Level: "MSL", LevelChange: "B" },
         })),
         ReferencedAirfields: {},
       },
@@ -101,14 +100,14 @@ export async function processFile(inputDirectory, outputDirectory, file) {
 
   // Validate JSON structure
   if (!isValidGarminFplJsonStructure(inputJson)) {
-    logError('Unexpected JSON structure');
+    logError("Unexpected JSON structure");
     return;
   }
 
   // Extract waypoints
   const waypoints = extractWaypoints(inputJson);
   if (!waypoints) {
-    logError('Unexpected JSON structure: Missing route information');
+    logError("Unexpected JSON structure: Missing route information");
     return;
   }
 
@@ -119,7 +118,7 @@ export async function processFile(inputDirectory, outputDirectory, file) {
   // Write the output to a file
   const outputFilePath = path.join(
     outputDirectory,
-    path.basename(file, path.extname(file)) + '.flightplan'
+    `${path.basename(file, path.extname(file))}.flightplan`
   );
 
   await writeFile(outputFilePath, outputXml);
@@ -139,14 +138,14 @@ async function main() {
 
   // Get the list of files and process each file
   const files = await getInputFiles(inputDirectory);
-  const fplFiles = filterFilesByExtension(files, '.fpl');
-  for (const file of files) {
-    await processFile(inputDirectory, outputDirectory, file);
-  }
+  const fplFiles = filterFilesByExtension(files, ".fpl");
+  fplFiles.forEach(async (file) =>
+    processFile(inputDirectory, outputDirectory, file)
+  );
 }
 
 // Start the program and catch any top-level errors
 main().catch((err) => {
-  const errorMessage = err.message || 'An unknown error occurred';
-  logError('An error occurred:', errorMessage);
+  const errorMessage = err.message || "An unknown error occurred";
+  logError("An error occurred:", errorMessage);
 });

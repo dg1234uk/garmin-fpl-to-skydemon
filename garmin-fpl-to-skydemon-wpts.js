@@ -1,5 +1,5 @@
-import path from 'path';
-import xml2js from 'xml-js';
+import path from "path";
+import xml2js from "xml-js";
 import {
   ensureDirectoryExists,
   filterFilesByExtension,
@@ -8,10 +8,10 @@ import {
   logError,
   readFile,
   writeFile,
-} from './utils/utils.js';
+} from "./utils/utils.js";
 
-const DEFAULT_INPUT_DIRECTORY = './input';
-const DEFAULT_OUTPUT_DIRECTORY = './output';
+const DEFAULT_INPUT_DIRECTORY = "./input";
+const DEFAULT_OUTPUT_DIRECTORY = "./output";
 
 // Convert XML to JSON
 // If the XML is invalid, log an error and return null
@@ -27,10 +27,9 @@ export function convertXmlToJson(inputXml, file) {
 
 // Extracts waypoints from input JSON
 export function extractWaypoints(inputJson) {
-  const waypoints =
-    inputJson['flight-plan']['waypoint-table']['waypoint'] || [];
+  const waypoints = inputJson["flight-plan"]["waypoint-table"].waypoint || [];
   if (waypoints.length === 0) {
-    logError('No waypoints found in the input file');
+    logError("No waypoints found in the input file");
   }
   return waypoints;
 }
@@ -58,15 +57,15 @@ export function sortWaypoints(uniqueWaypoints) {
 // Constructs the output JSON structure
 export function constructOutputJson(waypoints) {
   const output = {
-    _declaration: { _attributes: { version: '1.0', encoding: 'utf-8' } },
+    _declaration: { _attributes: { version: "1.0", encoding: "utf-8" } },
     gpx: {
       _attributes: {
-        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-        'xsi:schemaLocation':
-          'http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd',
-        version: '1.1',
-        creator: 'SkyDemon',
-        xmlns: 'http://www.topografix.com/GPX/1/1',
+        "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "xsi:schemaLocation":
+          "http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd",
+        version: "1.1",
+        creator: "SkyDemon",
+        xmlns: "http://www.topografix.com/GPX/1/1",
       },
       wpt: waypoints.map((waypoint) => ({
         _attributes: {
@@ -74,10 +73,10 @@ export function constructOutputJson(waypoints) {
           lon: waypoint.lon._text,
         },
         name: { _text: waypoint.identifier._text },
-        sym: { _text: 'Circle' },
+        sym: { _text: "Circle" },
         extensions: {
-          identifier: { _text: '' },
-          category: { _text: '' },
+          identifier: { _text: "" },
+          category: { _text: "" },
         },
       })),
     },
@@ -92,14 +91,14 @@ async function processFile(inputDirectory, file) {
 
   // Read input file
   const inputXml = await readFile(inputFile);
-  if (!inputXml) return;
+  if (!inputXml) return [];
 
   const inputJson = convertXmlToJson(inputXml, file);
 
   // Validate JSON structure
   if (!isValidGarminFplJsonStructure(inputJson)) {
-    logError('Unexpected JSON structure');
-    return;
+    logError("Unexpected JSON structure");
+    return [];
   }
 
   // Extract waypoints
@@ -114,15 +113,20 @@ async function processFile(inputDirectory, file) {
 export async function processFiles(inputDirectory, outputDirectory) {
   const files = await getInputFiles(inputDirectory);
 
-  const fplFiles = filterFilesByExtension(files, '.fpl');
+  const fplFiles = filterFilesByExtension(files, ".fpl");
 
   let allWaypoints = [];
-  for (const file of fplFiles) {
+
+  const waypointPromises = fplFiles.map(async (file) => {
     const waypoints = await processFile(inputDirectory, file);
-    if (waypoints) {
-      allWaypoints = allWaypoints.concat(waypoints);
-    }
-  }
+    return waypoints || []; // Ensure we always return an array, even if waypoints is undefined
+  });
+
+  const allWaypointsArrays = await Promise.all(waypointPromises);
+
+  allWaypointsArrays.forEach((waypoints) => {
+    allWaypoints = allWaypoints.concat(waypoints);
+  });
 
   // Remove duplicates
   const uniqueWaypoints = removeDuplicates(allWaypoints);
@@ -135,7 +139,7 @@ export async function processFiles(inputDirectory, outputDirectory) {
   // Convert the output JSON back to XML
   const outputXml = xml2js.json2xml(output, { compact: true, spaces: 2 });
   // Write the output to a file
-  const outputFilePath = path.join(outputDirectory, 'waypoints.gpx');
+  const outputFilePath = path.join(outputDirectory, "waypoints.gpx");
 
   await writeFile(outputFilePath, outputXml);
 }
@@ -159,6 +163,6 @@ async function main() {
 
 // Start the program and catch any top-level errors
 main().catch((err) => {
-  const errorMessage = err.message || 'An unknown error occurred';
-  logError('An error occurred:', errorMessage);
+  const errorMessage = err.message || "An unknown error occurred";
+  logError("An error occurred:", errorMessage);
 });

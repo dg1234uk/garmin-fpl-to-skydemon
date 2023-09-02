@@ -7,6 +7,7 @@ import {
   getInputFiles,
   logError,
   readFile,
+  toDecimalDegrees,
   writeFile,
 } from "./utils/utils.js";
 
@@ -25,48 +26,6 @@ export function convertCsvToJson(inputCsv) {
     return null;
   }
   return results.data;
-}
-
-/**
- * Converts a coordinate string in various formats (DMS, DM.m, D.d) to decimal degrees.
- * @param {string} coord - The coordinate string (e.g., 412412.2N, 4124.202N, 41.4034N, 412412N).
- * @returns {number|null} The coordinate in decimal degrees or null if format is not recognized.
- */
-function toDecimalDegrees(coord) {
-  // Define a list of expected patterns for various coordinate formats.
-  const patterns = [
-    { format: "DMSs", pattern: /^(\d{1,3})(\d{2})(\d{2}\.\d+)([NSEW])$/ }, // DMS with decimal seconds (e.g., 412412.2N)
-    { format: "DMm", pattern: /^(\d{1,3})(\d{2}\.\d+)([NSEW])$/ }, // DM with decimal minutes (e.g., 4124.202N)
-    { format: "Dd", pattern: /^(\d+\.\d+)([NSEW])$/ }, // Pure decimal (e.g., 41.4034N)
-    { format: "DMS", pattern: /^(\d{1,3})(\d{2})(\d{2})([NSEW])$/ }, // Standard DMS without any decimal (e.g., 412412N)
-  ];
-
-  // Initialize the variable to store the converted value.
-  let decimal = null;
-
-  // Loop through each pattern and attempt to match the input coordinate.
-  patterns.forEach((patternObj) => {
-    const match = coord.match(patternObj.pattern);
-    // If a match is found and the value hasn't been set yet...
-    if (match && decimal === null) {
-      // Extract and parse degree, minute, and second components.
-      const deg = parseFloat(match[1]);
-      const min = parseFloat(match[2] || 0);
-      const sec = parseFloat(match[3] || 0);
-
-      // Determine the direction (N, S, E, W) to decide if value should be negative.
-      const dir = match[4] || match[5]; // Adjust for patterns that might have different group counts
-
-      // Calculate the decimal degree value.
-      decimal = deg + min / 60 + sec / 3600;
-
-      // If the direction is South or West, the value should be negative.
-      if (dir === "S" || dir === "W") decimal *= -1;
-    }
-  });
-
-  // Return the converted decimal degree value (or null if no format matched).
-  return decimal;
 }
 
 // Extracts waypoints from input JSON

@@ -7,9 +7,9 @@ import {
   getInputFiles,
   logError,
   readFile,
-  toDecimalDegrees,
   writeFile,
 } from "./utils/utils.js";
+import { stringToDecimalDegrees } from "./utils/stringToDecimalDegrees.js";
 
 const DEFAULT_INPUT_DIRECTORY = "./input";
 const DEFAULT_OUTPUT_DIRECTORY = "./output";
@@ -31,8 +31,8 @@ export function convertCsvToJson(inputCsv) {
 // Extracts waypoints from input JSON
 export function extractWaypoints(inputJson) {
   const waypoints = inputJson.map((item) => {
-    const DdLat = toDecimalDegrees(item.latitude);
-    const DdLon = toDecimalDegrees(item.longitude);
+    const DdLat = stringToDecimalDegrees(item.latitude);
+    const DdLon = stringToDecimalDegrees(item.longitude);
     return {
       lat: { _text: DdLat },
       lon: { _text: DdLon },

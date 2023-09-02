@@ -71,7 +71,7 @@ Key functions of this script include:
 
 This script also logs errors to the console if there are issues with file reading or writing, XML parsing, or JSON structure validation.
 
-## `csv-wpts-to-skydemon-wpts.js`
+## csv-wpts-to-skydemon-wpts.js
 
 This tool processes CSV files containing waypoints (with latitude, longitude, and name columns) and produces a SkyDemon compatible waypoint file (`.gpx`). The script performs several key functions:
 

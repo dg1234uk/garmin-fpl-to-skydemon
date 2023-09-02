@@ -20,7 +20,7 @@ npm install
 
 ## Usage
 
-Both scripts are designed to operate independently. Each script accepts optional arguments specifying the input and output directories. In the absence of these arguments, they default to `./input` and `./output` respectively.
+The scripts are designed to operate independently. Each script accepts optional arguments specifying the input and output directories. In the absence of these arguments, they default to `./input` and `./output` respectively.
 
 Run the Garmin to SkyDemon waypoints conversion script with:
 
@@ -96,7 +96,7 @@ Errors encountered during the CSV parsing or file processing are logged to the c
 
 ## Dependencies
 
-Both scripts rely on Node.js and the `xml2js` library for XML and JSON conversions. They also use a `utils.js` utility module providing helper functions for ensuring directory existence, file extension filtering, file reading and writing, and error logging.
+The scripts rely on Node.js and the `xml2js` library for XML and JSON conversions. They also use a `utils.js` utility module providing helper functions for ensuring directory existence, file extension filtering, file reading and writing, and error logging.
 
 ### `utils.js`
 

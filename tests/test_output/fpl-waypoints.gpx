@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="SkyDemon" xmlns="http://www.topografix.com/GPX/1/1">
+  <wpt lat="53.8396" lon="-2.7952">
+    <name>A01</name>
+    <sym>Circle</sym>
+    <extensions>
+      <identifier></identifier>
+      <category></category>
+    </extensions>
+  </wpt>
+  <wpt lat="53.7969" lon="-2.7233">
+    <name>A02</name>
+    <sym>Circle</sym>
+    <extensions>
+      <identifier></identifier>
+      <category></category>
+    </extensions>
+  </wpt>
+  <wpt lat="53.7388" lon="-2.6972">
+    <name>A03</name>
+    <sym>Circle</sym>
+    <extensions>
+      <identifier></identifier>
+      <category></category>
+    </extensions>
+  </wpt>
+</gpx>

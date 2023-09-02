@@ -1,11 +1,12 @@
 # Garmin Flight Plan to SkyDemon
 
-This repository contains two Node.js tools for Garmin flight plan conversion:
+This repository contains three Node.js tools for flight plan conversion:
 
 1. `garmin-fpl-to-skydemon-wpts.js` - Converts waypoints from Garmin FPL files (`.fpl`) into SkyDemon waypoint files (`.gpx`).
 2. `garmin-fpl-to-skydemon-fpl.js` - Transforms Garmin FPL files into SkyDemon Flight Plan files (`.flightplan`).
+3. `csv-wpts-to-skydemon-wpts.js` - Converts CSV formatted waypoints into SkyDemon waypoint files (`.gpx`).
 
-Both tools operate by reading input files from a specified directory, processing each file, and then writing the results to an output directory.
+All tools operate by reading input files from a specified directory, processing each file, and then writing the results to an output directory.
 
 ## Getting Started
 
@@ -31,6 +32,12 @@ Run the Garmin to SkyDemon Flight Plan conversion script with:
 
 ```bash
 node garmin-fpl-to-skydemon-fpl.js [inputDirectory] [outputDirectory]
+```
+
+Run the CSV to SkyDemon waypoints conversion script with:
+
+```bash
+node csv-wpts-to-skydemon-wpts.js [inputDirectory] [outputDirectory]
 ```
 
 ## garmin-fpl-to-skydemon-wpts.js
@@ -64,6 +71,29 @@ Key functions of this script include:
 
 This script also logs errors to the console if there are issues with file reading or writing, XML parsing, or JSON structure validation.
 
+## `csv-wpts-to-skydemon-wpts.js`
+
+This tool processes CSV files containing waypoints (with latitude, longitude, and name columns) and produces a SkyDemon compatible waypoint file (`.gpx`). The script performs several key functions:
+
+- Converts CSV to JSON format.
+- Extracts waypoints from the JSON structure.
+- Removes any duplicate waypoints from the dataset.
+- Sorts waypoints alphabetically based on their identifier (name).
+- Constructs a SkyDemon-compatible XML structure and writes the result as a `.gpx` file.
+
+Key functions of this script include:
+
+- `convertCsvToJson`: Converts the CSV content into JSON format.
+- `extractWaypoints`: Maps the CSV row entries into waypoint JSON objects.
+- `removeDuplicates`: Filters out duplicate waypoints from the collection.
+- `sortWaypoints`: Arranges waypoints in alphabetical order based on their name.
+- `constructOutputJson`: Builds the final XML-structured JSON object for conversion to `.gpx` file.
+- `processFile`: Handles the reading and initial processing of each CSV file.
+- `processFiles`: Manages the processing of all CSV files in the given directory.
+- `main`: Sets up and kicks off the entire file processing routine.
+
+Errors encountered during the CSV parsing or file processing are logged to the console for debugging purposes.
+
 ## Dependencies
 
 Both scripts rely on Node.js and the `xml2js` library for XML and JSON conversions. They also use a `utils.js` utility module providing helper functions for ensuring directory existence, file extension filtering, file reading and writing, and error logging.
@@ -82,6 +112,10 @@ The utility module includes the following key functions:
 - `isValidGarminFplJsonStructure`: Validates the structure of a JSON object to ensure it has the required fields.
 - `filterFilesByExtension`: Filters a list of files based on their extension.
 - `ensureDirectoryExists`: Ensures a given directory exists.
+
+### `stringToDecimalDegrees.js`
+
+- `stringToDecimalDegrees`: Converts a string representation of latitude or longitude, that could be in various formats, to decimal degrees.
 
 ## Contributing
 

@@ -26,20 +26,58 @@ function extractCoordinateParts(coord) {
   }
 
   // Try pattern matching for D° M' S.s" N format
+  const dmsPattern = coord.match(
+    /^(\d+(\.\d+)?)°\s*(\d+(\.\d+)?)?\s*['’]?\s*(\d+(\.\d+)?)?\s*["”]?/
+  );
 
-  const dmsPattern = coord.match(/^(\d+)°\s?(\d+)['’]?\s?(\d+(\.\d+)?)?["”]?/);
   if (dmsPattern) {
-    const [degrees, minutes, seconds] = dmsPattern.slice(1, 4).map(Number);
-    // if degrees minutes or seconds are undefined, set them to 0
-    const parts = [degrees, minutes || 0, seconds || 0];
+    const [
+      ,
+      // fullMatch
+      degrees,
+      degreesDecimal,
+      minutes,
+      minutesDecimal,
+      seconds,
+      // secondsDecimal,
+    ] = dmsPattern;
+
+    if (degreesDecimal && (minutes || seconds)) return null; // Invalid if degrees have a decimal and either minutes or seconds are present
+    if (minutesDecimal && seconds) return null; // Invalid if minutes have a decimal and seconds are present
+
+    const parts = [
+      Number(degrees),
+      Number(minutes) || 0,
+      seconds ? Number(seconds) : 0,
+    ];
     if (!isValidDMS(parts, false)) return null;
     return parts;
   }
 
   if (coord.match(/[^0-9.]/)) {
-    const groups = coord.split(/[^0-9.]+/);
-    const parts = groups.map(Number);
+    // Regular expression for DMS.s, DM.m, or D.d formats
+    const dmsPattern2 =
+      /^(\d+(\.\d+)?)[°\s]*\s*(?:(\d+(\.\d+)?)['’\s]*\s*(?:(\d+(\.\d+)?)["”\s]*)?)?$/;
+
+    // Extract the values using the single regex pattern
+    const matches = coord.match(dmsPattern2);
+    if (!matches) return null;
+
+    const degrees = matches[1] ? Number(matches[1]) : 0;
+    const minutes = matches[3] ? Number(matches[3]) : 0;
+    const seconds = matches[5] ? Number(matches[5]) : 0;
+
+    // If the degrees part has a decimal, then neither the minutes nor the seconds parts should be present.
+    if (degrees % 1 !== 0 && (minutes !== 0 || seconds !== 0)) return null;
+
+    // If the minutes part has a decimal, then the seconds part should not be present.
+    if (minutes % 1 !== 0 && seconds !== 0) return null;
+
+    const parts = [degrees, minutes, seconds];
     if (!isValidDMS(parts, false)) return null;
+
+    console.log(parts);
+
     return parts;
   }
 
@@ -116,20 +154,35 @@ function isValidLongitudeDMS(parts) {
   );
 }
 
+function isValidInput(coord) {
+  // Check if input contains at least one digit
+  if (!/\d/.test(coord)) return false;
+
+  // Check for any invalid characters
+  if (/[^°"”'’NESW\d\s.+-]/i.test(coord)) return false;
+
+  // Check for more than one occurrence of N, E, S, or W
+  if ((coord.match(/[NESW]/gi) || []).length > 1) return false;
+
+  // Check for more than one occurrence of + or -
+  if ((coord.match(/[+-]/g) || []).length > 1) return false;
+
+  // Check for more than one occurrence of decimal point
+  if ((coord.match(/\./g) || []).length > 1) return false;
+
+  return true; // If all checks pass
+}
+
 export function stringToDecimalDegrees(coord) {
   // Check if coord is string
   if (typeof coord !== "string") return null;
 
   const coordCleaned = coord.trim();
 
-  // Check if input contains at least one digit
-  if (!/\d/.test(coord)) return null;
-
-  // Check for invalid characters
-  if (/[^°"”'’NESW\d\s.+-]/i.test(coord)) return null;
+  if (!isValidInput(coordCleaned)) return null;
 
   const directionMultiplier = determineDirectionMultiplier(coordCleaned);
-  const coordWithoutDirection = coordCleaned.replace(/[NSEW-]/gi, "").trim();
+  const coordWithoutDirection = coordCleaned.replace(/[NSEW+-]/gi, "").trim();
 
   const parts = extractCoordinateParts(coordWithoutDirection);
 
@@ -147,15 +200,18 @@ export function stringToDecimalDegrees(coord) {
 
 export default stringToDecimalDegrees;
 
-// function test(coord, expected) {
-//   const result = stringToDecimalDegrees(coord);
-//   const resultColor = "\x1b[33m"; // Yellow color
-//   const resetColor = "\x1b[0m"; // Reset color
+function test(coord, expected) {
+  const result = stringToDecimalDegrees(coord);
+  const resultColor = "\x1b[33m"; // Yellow color
+  const resetColor = "\x1b[0m"; // Reset color
 
-//   console.log(
-//     `${coord} = ${resultColor}${result}${resetColor}\n(Expected: ${expected})\n`
-//   );
-// }
+  console.log(
+    `${coord} = ${resultColor}${result}${resetColor}\n(Expected: ${expected})\n`
+  );
+}
+
+test(`'44.943"N`, 0.012484167);
+test(`53 14.943N`, 53.24905);
 
 // test("412412.2N", 41.40338889);
 // test("4124.202N", 41.40336667);

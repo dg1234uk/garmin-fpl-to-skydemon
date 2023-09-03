@@ -1,10 +1,11 @@
 # Garmin Flight Plan to SkyDemon
 
-This repository contains three Node.js tools for flight plan conversion:
+This repository contains four Node.js tools for flight plan conversion:
 
 1. `garmin-fpl-to-skydemon-wpts.js` - Converts waypoints from Garmin FPL files (`.fpl`) into SkyDemon waypoint files (`.gpx`).
 2. `garmin-fpl-to-skydemon-fpl.js` - Transforms Garmin FPL files into SkyDemon Flight Plan files (`.flightplan`).
 3. `csv-wpts-to-skydemon-wpts.js` - Converts CSV formatted waypoints into SkyDemon waypoint files (`.gpx`).
+4. `gpx-wpts-to-garmin-fpl.js` - Converts GPX formatted waypoints into Garmin Flight Plan files (`.fpl`).
 
 All tools operate by reading input files from a specified directory, processing each file, and then writing the results to an output directory.
 
@@ -38,6 +39,12 @@ Run the CSV to SkyDemon waypoints conversion script with:
 
 ```bash
 node csv-wpts-to-skydemon-wpts.js [inputDirectory] [outputDirectory]
+```
+
+Run the GPX to Garmin Flight Plan conversion script with:
+
+```bash
+node gpx-wpts-to-garmin-fpl.js [inputDirectory] [outputDirectory]
 ```
 
 ## garmin-fpl-to-skydemon-wpts.js
@@ -93,6 +100,29 @@ Key functions of this script include:
 - `main`: Sets up and kicks off the entire file processing routine.
 
 Errors encountered during the CSV parsing or file processing are logged to the console for debugging purposes.
+
+## gpx-wpts-to-garmin-fpl.js
+
+This tool transforms waypoints from GPX files (`.gpx`) to Garmin Flight Plan files (`.fpl`). It processes GPX waypoints, removing duplicates and sorting them alphabetically by name, before constructing them into a Garmin-compatible flight plan. This allows you to import waypoints into Garmin Pilot or Garmin G1000.
+
+**Key functions of this script include**:
+
+- `convertXmlToJson`: Transforms an XML GPX file to a JSON format.
+- `isValidGpxJsonStructure`: Validates if a given JSON structure correctly represents a GPX file.
+- `processFile`: Reads a file, validates its structure, and extracts waypoints.
+- `constructOutputJson`: Constructs output JSON with waypoints in a Garmin FPL format.
+- `removeDuplicateWaypoints`: Filters out duplicate waypoints based on their latitude, longitude, and name.
+- `sortWaypoints`: Sorts waypoints alphabetically by their names.
+- `processFiles`: Processes all GPX files in the specified directory, accumulating waypoints.
+- `main`: Orchestrates the file processing pipeline.
+
+To **use this tool**, run the following command:
+
+```bash
+node gpx-wpts-to-garmin-fpl.js [inputDirectory] [outputDirectory]
+```
+
+If no input and output directories are provided, it defaults to `./input` and `./output` respectively.
 
 ## Dependencies
 

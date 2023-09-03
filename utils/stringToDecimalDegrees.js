@@ -245,17 +245,17 @@ export function stringToDecimalDegrees(coord) {
 
 export default stringToDecimalDegrees;
 
-function test(coord, expected) {
-  const result = stringToDecimalDegrees(coord);
-  const resultColor = "\x1b[33m"; // Yellow color
-  const resetColor = "\x1b[0m"; // Reset color
+// function test(coord, expected) {
+//   const result = stringToDecimalDegrees(coord);
+//   const resultColor = "\x1b[33m"; // Yellow color
+//   const resetColor = "\x1b[0m"; // Reset color
 
-  console.log(
-    `${coord} = ${resultColor}${result}${resetColor}\n(Expected: ${expected})\n`
-  );
-}
+//   console.log(
+//     `${coord} = ${resultColor}${result}${resetColor}\n(Expected: ${expected})\n`
+//   );
+// }
 
-test("53S23.2458", null);
+// test("53S23.2458", null);
 // test(`53 14.943N`, 53.24905);
 
 // test("412412.2N", 41.40338889);

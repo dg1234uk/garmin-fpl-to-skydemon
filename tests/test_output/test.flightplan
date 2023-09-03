@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<DivelementsFlightPlanner>
-  <PrimaryRoute CourseType="GreatCircle" Start="N535022.56 W0024742.72" Level="3000" Rules="Vfr" PlannedFuel="1.000000">
-    <RhumbLineRoute To="N534748.84 W0024323.88" Level="MSL" LevelChange="B"/>
-    <RhumbLineRoute To="N534419.68 W0024149.92" Level="MSL" LevelChange="B"/>
-    <RhumbLineRoute To="N535022.56 W0024742.72" Level="MSL" LevelChange="B"/>
-    <ReferencedAirfields/>
-  </PrimaryRoute>
-</DivelementsFlightPlanner>

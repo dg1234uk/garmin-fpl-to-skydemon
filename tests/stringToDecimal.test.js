@@ -170,3 +170,173 @@ test("Missing seconds in DMS format", () => {
   const result = stringToDecimalDegrees("53°14'");
   expect(result).toBeCloseTo(53.23333333);
 });
+
+test("Longitude with N/S direction", () => {
+  const result = stringToDecimalDegrees(`176°34'24.55"N`);
+  expect(result).toBe(null);
+});
+
+test("Extra whitespaces", () => {
+  const result = stringToDecimalDegrees(`   53° 14 ' 44.943 " N   `);
+  expect(result).toBeCloseTo(53.2458175);
+});
+
+test("Non-string input", () => {
+  const result = stringToDecimalDegrees(12345);
+  expect(result).toBe(null);
+});
+
+test("Latitude with + sign", () => {
+  const result = stringToDecimalDegrees(`+53°14'44.943"`);
+  expect(result).toBeCloseTo(53.2458175);
+});
+
+test("Longitude with - sign and no direction", () => {
+  const result = stringToDecimalDegrees(`-176°34'24.55"`);
+  expect(result).toBeCloseTo(-176.5734861);
+});
+
+test("Multiple directions", () => {
+  const result = stringToDecimalDegrees(`53°14'44.943"NNW`);
+  expect(result).toBe(null);
+});
+
+test("Only direction without coordinates", () => {
+  const result = stringToDecimalDegrees("N");
+  expect(result).toBe(null);
+});
+
+test("Fractional degrees without seconds", () => {
+  const result = stringToDecimalDegrees("53.2458°N");
+  expect(result).toBeCloseTo(53.2458);
+});
+
+test("Leading zeroes", () => {
+  const result = stringToDecimalDegrees(`053°014'044.943"N`);
+  expect(result).toBeCloseTo(53.2458175);
+});
+
+test("Mixed case", () => {
+  const result = stringToDecimalDegrees(`53°14'44.943"n`);
+  expect(result).toBeCloseTo(53.2458175);
+});
+
+test("Invalid symbols", () => {
+  const result = stringToDecimalDegrees(`53*14'44.943"N`);
+  expect(result).toBe(null);
+});
+
+test("Missing degrees", () => {
+  const result = stringToDecimalDegrees(`'44.943"N`);
+  expect(result).toBe(null);
+});
+
+test("Invalid characters in the middle", () => {
+  const result = stringToDecimalDegrees(`53°14'X44.943"N`);
+  expect(result).toBe(null);
+});
+
+test("Multiple decimal points", () => {
+  const result = stringToDecimalDegrees("53.24.58N");
+  expect(result).toBe(null);
+});
+
+test("Surrounded by invalid characters", () => {
+  const result = stringToDecimalDegrees(`[53°14'44.943"]`);
+  expect(result).toBe(null);
+});
+
+test("DMS with decimal minutes", () => {
+  const result = stringToDecimalDegrees(`53°14.5'44"N`);
+  expect(result).toBe(null);
+});
+
+test("Very large numbers", () => {
+  const result = stringToDecimalDegrees(`9999°9999'9999"N`);
+  expect(result).toBe(null); // Should be out of bounds.
+});
+
+test("String with only spaces", () => {
+  const result = stringToDecimalDegrees("     ");
+  expect(result).toBe(null);
+});
+
+test("Just under the northern latitude boundary", () => {
+  const result = stringToDecimalDegrees("89.9999N");
+  expect(result).toBeCloseTo(89.9999);
+});
+
+test("Just over the northern latitude boundary", () => {
+  const result = stringToDecimalDegrees("90.0001N");
+  expect(result).toBe(null);
+});
+
+test("Just under the eastern longitude boundary", () => {
+  const result = stringToDecimalDegrees("179.9999E");
+  expect(result).toBeCloseTo(179.9999);
+});
+
+test("Just over the eastern longitude boundary", () => {
+  const result = stringToDecimalDegrees("180.0001E");
+  expect(result).toBe(null);
+});
+
+test("Number input", () => {
+  const result = stringToDecimalDegrees(53.2458175);
+  expect(result).toBe(null);
+});
+
+test("Object input", () => {
+  const result = stringToDecimalDegrees({ lat: `53°14'44.943"N` });
+  expect(result).toBe(null);
+});
+
+test("Array input", () => {
+  const result = stringToDecimalDegrees([`53°14'44.943"N`]);
+  expect(result).toBe(null);
+});
+
+test("Mixed sign and direction", () => {
+  const result = stringToDecimalDegrees(`-53°14'44.943"N`);
+  expect(result).toBe(null); // This should be invalid as it's mixed.
+});
+
+test("Uppercase coordinate", () => {
+  const result = stringToDecimalDegrees(`53°14'44.943"N`);
+  expect(result).toBeCloseTo(53.2458175);
+});
+
+test("Lowercase coordinate", () => {
+  const result = stringToDecimalDegrees(`53°14'44.943"n`);
+  expect(result).toBeCloseTo(53.2458175);
+});
+
+test("Mixed case direction indicators", () => {
+  const result = stringToDecimalDegrees("53.2458nE");
+  expect(result).toBe(null);
+});
+
+test("Direction indicator in middle", () => {
+  const result = stringToDecimalDegrees("53S23.2458");
+  expect(result).toBe(null);
+});
+
+test("Only direction indicators with decimal", () => {
+  const result = stringToDecimalDegrees(".N");
+  expect(result).toBe(null);
+});
+
+test("Leading zeroes in coordinates", () => {
+  const result = stringToDecimalDegrees(`053°014'044.943"N`);
+  expect(result).toBeCloseTo(53.2458175);
+});
+
+test("SQL injection-like input", () => {
+  const result = stringToDecimalDegrees("'; DROP TABLE users; --");
+  expect(result).toBe(null);
+});
+
+test("Script tags input", () => {
+  const result = stringToDecimalDegrees("<script>alert('hi')</script>");
+  expect(result).toBe(null);
+});

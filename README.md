@@ -126,7 +126,7 @@ If no input and output directories are provided, it defaults to `./input` and `.
 
 ## Dependencies
 
-The scripts rely on Node.js and the `xml2js` library for XML and JSON conversions. They also use a `utils.js` utility module providing helper functions for ensuring directory existence, file extension filtering, file reading and writing, and error logging.
+The scripts rely on Node.js, `xml2js` library for XML and JSON conversions, and `papaparse` for parsing CSV. They also use a `utils.js` utility module providing helper functions for ensuring directory existence, file extension filtering, file reading and writing, and error logging. `stringToDecimalDegrees.js` is another utility module that converts string representations of latitude and longitude to decimal degrees.
 
 ### `utils.js`
 

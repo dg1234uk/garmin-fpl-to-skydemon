@@ -11,7 +11,7 @@ All tools operate by reading input files from a specified directory, processing 
 
 ## Getting Started
 
-To utilize these tools, ensure you have Node.js installed on your system. Then, clone the repository and install the necessary dependencies.
+To utilise these tools, ensure you have Node.js installed on your system. Then, clone the repository and install the necessary dependencies.
 
 ```bash
 git clone https://github.com/dg1234uk/garmin-fpl-to-skydemon.git

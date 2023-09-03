@@ -4,4 +4,5 @@ input/
 output/
 coverage/
 .vscode/
-tests/test_output/**
+tests/test_output/*
+!tests/test_output/.gitignore

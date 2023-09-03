@@ -170,3 +170,88 @@ test("Missing seconds in DMS format", () => {
   const result = stringToDecimalDegrees("53°14'");
   expect(result).toBeCloseTo(53.23333333);
 });
+
+test("Longitude with N/S direction", () => {
+  const result = stringToDecimalDegrees(`176°34'24.55"N`);
+  expect(result).toBe(null);
+});
+
+test("Extra whitespaces", () => {
+  const result = stringToDecimalDegrees(`   53° 14 ' 44.943 " N   `);
+  expect(result).toBeCloseTo(53.2458175);
+});
+
+test("Non-string input", () => {
+  const result = stringToDecimalDegrees(12345);
+  expect(result).toBe(null);
+});
+
+test("Latitude with + sign", () => {
+  const result = stringToDecimalDegrees(`+53°14'44.943"`);
+  expect(result).toBeCloseTo(53.2458175);
+});
+
+test("Longitude with - sign and no direction", () => {
+  const result = stringToDecimalDegrees(`-176°34'24.55"`);
+  expect(result).toBeCloseTo(-176.5734861);
+});
+
+test("Multiple directions", () => {
+  const result = stringToDecimalDegrees(`53°14'44.943"NNW`);
+  expect(result).toBe(null);
+});
+
+test("Only direction without coordinates", () => {
+  const result = stringToDecimalDegrees("N");
+  expect(result).toBe(null);
+});
+
+test("Fractional degrees without seconds", () => {
+  const result = stringToDecimalDegrees("53.2458°N");
+  expect(result).toBeCloseTo(53.2458);
+});
+
+test("Leading zeroes", () => {
+  const result = stringToDecimalDegrees(`053°014'044.943"N`);
+  expect(result).toBeCloseTo(53.2458175);
+});
+
+test("Mixed case", () => {
+  const result = stringToDecimalDegrees(`53°14'44.943"n`);
+  expect(result).toBeCloseTo(53.2458175);
+});
+
+test("Invalid symbols", () => {
+  const result = stringToDecimalDegrees(`53*14'44.943"N`);
+  expect(result).toBe(null);
+});
+
+test("Missing degrees", () => {
+  const result = stringToDecimalDegrees(`'44.943"N`);
+  expect(result).toBe(null);
+});
+
+test("Invalid characters in the middle", () => {
+  const result = stringToDecimalDegrees(`53°14'X44.943"N`);
+  expect(result).toBe(null);
+});
+
+test("Multiple decimal points", () => {
+  const result = stringToDecimalDegrees("53.24.58N");
+  expect(result).toBe(null);
+});
+
+test("Surrounded by invalid characters", () => {
+  const result = stringToDecimalDegrees(`[53°14'44.943"]`);
+  expect(result).toBe(null);
+});
+
+test("DMS with decimal minutes", () => {
+  const result = stringToDecimalDegrees(`53°14.5'44"N`);
+  expect(result).toBe(null);
+});
+
+test("Very large numbers", () => {
+  const result = stringToDecimalDegrees(`9999°9999'9999"N`);
+  expect(result).toBe(null); // Should be out of bounds.
+});

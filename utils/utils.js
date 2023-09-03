@@ -2,8 +2,8 @@ import fs from "fs";
 import path from "path";
 
 // Helper function to log errors to console
-export function logError(message) {
-  console.error(message);
+export function logError(...message) {
+  console.error(...message);
 }
 
 // Helper function to asynchronously read a file and return its contents

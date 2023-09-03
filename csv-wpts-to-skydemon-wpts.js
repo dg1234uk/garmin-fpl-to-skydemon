@@ -106,8 +106,6 @@ async function processFile(inputDirectory, file) {
 
   const inputJson = convertCsvToJson(inputCsv);
 
-  // TODO: Validate the input CSV structure
-
   // Extract waypoints
   const waypoints = extractWaypoints(inputJson);
 

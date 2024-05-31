@@ -47,6 +47,10 @@ Run the GPX to Garmin Flight Plan conversion script with:
 node gpx-wpts-to-garmin-fpl.js [inputDirectory] [outputDirectory]
 ```
 
+### Loading Flight Plans onto Garmin G1000
+
+Load the `.fpl` file onto the root directory of the supplemental SD card. Insert SD card into the top slot of the MFD, power cycle the MFD (via CB or aircraft power). Then import the flight plan from the flight plan catalogue page.
+
 ## garmin-fpl-to-skydemon-wpts.js
 
 This tool transforms waypoints from Garmin FPL files (`.fpl`) to SkyDemon waypoint files (`.gpx`). During the conversion process, it removes duplicate waypoints and sorts them alphabetically by name.

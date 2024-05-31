@@ -64,7 +64,7 @@ test("should create an output file with the correct content", async () => {
 
   await wpts.processFiles(inputDirectory, outputDirectory, file);
 
-  const outputFile = path.join(outputDirectory, "waypoints.gpx");
+  const outputFile = path.join(outputDirectory, "fpl-waypoints.gpx");
   const content = await readFile(outputFile);
 
   const expectedContent = `<?xml version="1.0" encoding="utf-8"?>

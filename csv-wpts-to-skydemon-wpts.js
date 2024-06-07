@@ -31,8 +31,17 @@ export function convertCsvToJson(inputCsv) {
 // Extracts waypoints from input JSON
 export function extractWaypoints(inputJson) {
   const waypoints = inputJson.map((item) => {
-    const DdLat = stringToDecimalDegrees(item.latitude);
-    const DdLon = stringToDecimalDegrees(item.longitude);
+    const DdLat = stringToDecimalDegrees(String(item.latitude));
+    const DdLon = stringToDecimalDegrees(String(item.longitude));
+    console.log(item.latitude);
+    console.log(DdLat);
+    console.log(
+      JSON.stringify({
+        lat: { _text: DdLat },
+        lon: { _text: DdLon },
+        identifier: { _text: item.name },
+      })
+    );
     return {
       lat: { _text: DdLat },
       lon: { _text: DdLon },

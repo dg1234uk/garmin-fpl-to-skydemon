@@ -1,7 +1,10 @@
 import Papa from "papaparse";
 import {
+  constructOutputFilePath,
   convertLatitude,
   convertLongitude,
+  ensureDirectoryExists,
+  isValidExtensionFile,
   logError,
   readFile,
   writeFile,
@@ -129,13 +132,16 @@ async function main() {
   const [inputFilePath, outputDirectory = DEFAULT_OUTPUT_DIRECTORY] =
     process.argv.slice(2);
 
-  // Ensure directories exist
-  // await ensureDirectoryExists(inputFilePath);
-  // await ensureDirectoryExists(outputDirectory, true);
+  isValidExtensionFile(inputFilePath, "csv");
+  await ensureDirectoryExists(outputDirectory, true);
 
-  // TODO: Validate input file path
+  const outputFilePath = constructOutputFilePath(
+    inputFilePath,
+    outputDirectory,
+    "flightplan"
+  );
 
-  await processFile(inputFilePath, outputDirectory);
+  await processFile(inputFilePath, outputFilePath);
 }
 
 // Start the program and catch any top-level errors

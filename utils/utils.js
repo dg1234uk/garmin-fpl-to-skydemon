@@ -74,7 +74,7 @@ export async function ensureDirectoryExists(
 }
 
 /**
- * Checks if the provided file path points to a valid given extension file.
+ * Checks if the provided file path points to a valid file with given extension.
  * @param {string} filePath - The file path to check.
  * @param {string} extension - The expected file extension.
  * @returns {boolean} True if the file is a valid .csv file, false otherwise.
@@ -94,7 +94,7 @@ export async function isValidExtensionFile(filePath, extension) {
 }
 
 /**
- * Constructs the output file path with the same base name as the input file but with a .flightplan extension.
+ * Constructs the output file path with the same base name as the input file but with a the passed extension.
  * @param {string} inputFilePath - The input file path.
  * @param {string} outputDirectory - The output directory.
  * @param {string} extension - The output file extension.

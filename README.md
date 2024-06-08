@@ -1,11 +1,12 @@
 # Garmin Flight Plan to SkyDemon
 
-This repository contains four Node.js tools for flight plan conversion:
+This repository contains five Node.js tools for flight plan conversion:
 
-1. `garmin-fpl-to-skydemon-wpts.js` - Converts waypoints from Garmin FPL files (`.fpl`) into SkyDemon waypoint files (`.gpx`).
-2. `garmin-fpl-to-skydemon-fpl.js` - Transforms Garmin FPL files into SkyDemon Flight Plan files (`.flightplan`).
-3. `csv-wpts-to-skydemon-wpts.js` - Converts CSV formatted waypoints into SkyDemon waypoint files (`.gpx`).
-4. `gpx-wpts-to-garmin-fpl.js` - Converts GPX formatted waypoints into Garmin Flight Plan files (`.fpl`).
+1. `csv-wpts-to-skydemon-wpts.js` - Converts CSV formatted waypoints into SkyDemon waypoint files (`.gpx`).
+2. `csv-wpts-to-skydemon-flightplan.js` - Converts CSV formatted waypoints into SkyDemon Flight Plan files (`.flightplan`).
+3. `gpx-wpts-to-garmin-fpl.js` - Converts GPX formatted waypoints into Garmin Flight Plan files (`.fpl`).
+4. `garmin-fpl-to-skydemon-wpts.js` - Converts waypoints from Garmin FPL files (`.fpl`) into SkyDemon waypoint files (`.gpx`).
+5. `garmin-fpl-to-skydemon-fpl.js` - Transforms Garmin FPL files into SkyDemon Flight Plan files (`.flightplan`).
 
 All tools operate by reading input files from a specified directory, processing each file, and then writing the results to an output directory.
 
@@ -45,6 +46,12 @@ Run the GPX to Garmin Flight Plan conversion script with:
 
 ```bash
 node gpx-wpts-to-garmin-fpl.js [inputDirectory] [outputDirectory]
+```
+
+Run the CSV to SkyDemon Flight Plan conversion script with:
+
+```bash
+node csv-wpts-to-skydemon-flightplan.js [inputFilePath] [outputDirectory]
 ```
 
 ### Loading Flight Plans onto Garmin G1000
@@ -128,6 +135,32 @@ node gpx-wpts-to-garmin-fpl.js [inputDirectory] [outputDirectory]
 
 If no input and output directories are provided, it defaults to `./input` and `./output` respectively.
 
+## csv-wpts-to-skydemon-flightplan.js
+
+This tool processes CSV files containing waypoints (with latitude, longitude, and name columns) and produces a SkyDemon compatible flight plan file (`.flightplan`). The script performs several key functions:
+
+- Converts CSV to JSON format.
+- Extracts waypoints from the JSON structure.
+- Converts waypoints to SkyDemon Flight Plan format.
+- Constructs a SkyDemon-compatible XML structure and writes the result as a `.flightplan` file.
+
+**Key functions of this script include**:
+
+- `convertCsvToJson`: Converts the CSV content into JSON format.
+- `extractWaypoints`: Maps the CSV row entries into waypoint JSON objects.
+- `convertToSkyDemonFlightPlan`: Constructs the final XML-structured JSON object for conversion to `.flightplan` file.
+- `processFile`: Handles the reading and initial processing of each CSV file.
+- `main`: Sets up and kicks off the entire file processing routine.
+  Errors encountered during the CSV parsing or file processing are logged to the console for debugging purposes.
+
+To **use this tool**, run the following command:
+
+```bash
+node csv-wpts-to-skydemon-flightplan.js [inputFilePath] [outputDirectory]
+```
+
+If no input and output directories are provided, it defaults to `./input` and `./output` respectively.
+
 ## Dependencies
 
 The scripts rely on Node.js, `xml2js` library for XML and JSON conversions, and `papaparse` for parsing CSV. They also use a `utils.js` utility module providing helper functions for ensuring directory existence, file extension filtering, file reading and writing, and error logging. `stringToDecimalDegrees.js` is another utility module that converts string representations of latitude and longitude to decimal degrees.
@@ -146,6 +179,8 @@ The utility module includes the following key functions:
 - `isValidGarminFplJsonStructure`: Validates the structure of a JSON object to ensure it has the required fields.
 - `filterFilesByExtension`: Filters a list of files based on their extension.
 - `ensureDirectoryExists`: Ensures a given directory exists.
+- `isValidExtensionFile`: Checks if the provided file path points to a valid file with given extension.
+- `constructOutputFilePath`: Constructs the output file path based on the input file path and output directory.
 
 ### `stringToDecimalDegrees.js`
 

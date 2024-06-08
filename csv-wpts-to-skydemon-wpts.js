@@ -12,7 +12,7 @@ import {
 import { stringToDecimalDegrees } from "./utils/stringToDecimalDegrees.js";
 
 const DEFAULT_INPUT_DIRECTORY = "./input";
-const DEFAULT_OUTPUT_DIRECTORY = "./output";
+// const DEFAULT_OUTPUT_DIRECTORY = "./output";
 
 // Convert CSV to JSON
 export function convertCsvToJson(inputCsv) {
@@ -95,6 +95,12 @@ export function constructOutputJson(waypoints) {
   return output;
 }
 
+// Converts input CSV string to JSON
+function convertInputCsvToJson(inputCsv) {
+  if (!inputCsv) return [];
+  return convertCsvToJson(inputCsv);
+}
+
 // Core function to process a single file
 // Reads the file, converts it to JSON, validates the structure, and extracts waypoints
 async function processFile(inputDirectory, file) {
@@ -102,9 +108,8 @@ async function processFile(inputDirectory, file) {
 
   // Read input file
   const inputCsv = await readFile(inputFile);
-  if (!inputCsv) return [];
 
-  const inputJson = convertCsvToJson(inputCsv);
+  const inputJson = convertInputCsvToJson(inputCsv);
 
   // Extract waypoints
   const waypoints = extractWaypoints(inputJson);
@@ -112,10 +117,25 @@ async function processFile(inputDirectory, file) {
   return waypoints;
 }
 
+// Creates unique and sorted output XML from waypoints
+function uniqueSortedOutput(waypoints) {
+  // Remove duplicates
+  const uniqueWaypoints = removeDuplicates(waypoints);
+  // Sort waypoints alphabetically by name
+  const sortedWaypoints = sortWaypoints(uniqueWaypoints);
+
+  const output = constructOutputJson(sortedWaypoints);
+
+  // Convert the output JSON back to XML
+  const outputXml = xml2js.json2xml(output, { compact: true, spaces: 2 });
+
+  return outputXml;
+}
+
 // Process all files in the input directory
 // Filters for .csv files, processes them, removes duplicate waypoints, sorts waypoints,
-// constructs output JSON, converts it to XML, and writes it to a file in the output directory
-export async function processFiles(inputDirectory, outputDirectory) {
+// constructs output JSON, converts it to XML
+export async function processFiles(inputDirectory) {
   const files = await getInputFiles(inputDirectory);
 
   const csvFiles = filterFilesByExtension(files, ".csv");
@@ -133,37 +153,53 @@ export async function processFiles(inputDirectory, outputDirectory) {
     allWaypoints = allWaypoints.concat(waypoints);
   });
 
-  // Remove duplicates
-  const uniqueWaypoints = removeDuplicates(allWaypoints);
+  const outputXml = uniqueSortedOutput(allWaypoints);
 
-  // Sort waypoints alphabetically by name
-  const sortedWaypoints = sortWaypoints(uniqueWaypoints);
+  return outputXml;
+}
 
-  const output = constructOutputJson(sortedWaypoints);
-
-  // Convert the output JSON back to XML
-  const outputXml = xml2js.json2xml(output, { compact: true, spaces: 2 });
-  // Write the output to a file
+// Process and write file to output directory
+async function processWriteFiles(inputDirectory, outputDirectory) {
+  const outputXml = await processFiles(inputDirectory);
   const outputFilePath = path.join(outputDirectory, "csv-waypoints.gpx");
-
   await writeFile(outputFilePath, outputXml);
 }
 
 // Main function to start the program
 // Sets input and output directories, ensures they exist, and processes the files
 async function main() {
-  // Set input and output directories from command-line arguments or use defaults
-  const [
-    inputDirectory = DEFAULT_INPUT_DIRECTORY,
-    outputDirectory = DEFAULT_OUTPUT_DIRECTORY,
-  ] = process.argv.slice(2);
+  const [inputDirectory, outputDirectory] = process.argv.slice(2);
+  if (inputDirectory && inputDirectory !== "-") {
+    // If an inputDirectory is specified and it is not - (used for stream in)
+    const inputDir = inputDirectory || DEFAULT_INPUT_DIRECTORY;
+    await ensureDirectoryExists(inputDir);
 
-  // Ensure directories exist
-  await ensureDirectoryExists(inputDirectory);
-  await ensureDirectoryExists(outputDirectory, true);
+    if (outputDirectory) {
+      // If an inputDirectory && outputDirectory are specified
+      // Read file(s) in, write file out
+      await ensureDirectoryExists(outputDirectory, true);
+      await processWriteFiles(inputDir, outputDirectory);
+    } else {
+      // If an inputDirectory is specified but outputDirectory is not
+      // Read file(s) in, stream out
+      const outputXml = await processFiles(inputDir);
+      process.stdout.write(outputXml);
+    }
+  } else {
+    // Input directory specified as '-' and no output directory specified
+    // Stream In, Stream Out
+    let inputCsv = ``;
+    process.stdin.on("data", (chunk) => {
+      inputCsv += chunk;
+    });
 
-  // Get the list of files and process each file
-  await processFiles(inputDirectory, outputDirectory);
+    process.stdin.on("end", async () => {
+      const inputJson = convertCsvToJson(inputCsv);
+      const waypoints = extractWaypoints(inputJson);
+      const outputXml = uniqueSortedOutput(waypoints);
+      process.stdout.write(outputXml);
+    });
+  }
 }
 
 // Start the program and catch any top-level errors

@@ -73,6 +73,42 @@ export async function ensureDirectoryExists(
   }
 }
 
+/**
+ * Checks if the provided file path points to a valid given extension file.
+ * @param {string} filePath - The file path to check.
+ * @param {string} extension - The expected file extension.
+ * @returns {boolean} True if the file is a valid .csv file, false otherwise.
+ */
+export async function isValidExtensionFile(filePath, extension) {
+  const fileExtension = path.extname(filePath).toLowerCase();
+  try {
+    await fs.promises.access(filePath);
+    if (fileExtension !== `.${extension.toLowerCase()}`) {
+      throw new Error(
+        `Invalid file extension: ${fileExtension}. Expected: ${extension}`
+      );
+    }
+  } catch (error) {
+    throw new Error(`Invalid file path: ${filePath}`);
+  }
+}
+
+/**
+ * Constructs the output file path with the same base name as the input file but with a .flightplan extension.
+ * @param {string} inputFilePath - The input file path.
+ * @param {string} outputDirectory - The output directory.
+ * @param {string} extension - The output file extension.
+ * @returns {string} The constructed output file path.
+ */
+export function constructOutputFilePath(
+  inputFilePath,
+  outputDirectory,
+  extension
+) {
+  const baseName = path.basename(inputFilePath, path.extname(inputFilePath));
+  return path.join(outputDirectory, `${baseName}.${extension}`);
+}
+
 // Convert Decimal Degrees to Degrees, Minutes, Seconds
 export function convertDd2DMS(decimalDegrees) {
   const sign = Math.sign(decimalDegrees);
